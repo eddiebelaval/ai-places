@@ -1,2 +1,2 @@
-export * from './canvas';
-export * from './colors';
+export * from './canvas.js';
+export * from './colors.js';

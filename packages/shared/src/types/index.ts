@@ -1,3 +1,3 @@
-export * from './canvas';
-export * from './user';
-export * from './messages';
+export * from './canvas.js';
+export * from './user.js';
+export * from './messages.js';
