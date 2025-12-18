@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import type { ColorIndex } from '@x-place/shared';
+import { ZOOM, type ColorIndex } from '@x-place/shared';
 
 interface UIState {
   /** Selected color index (0-15) */
@@ -50,7 +50,7 @@ export const useUIStore = create<UIState>()(
         selectedColor: 0 as ColorIndex,
         currentX: 250,
         currentY: 250,
-        zoom: 4,
+        zoom: ZOOM.DEFAULT,
         isSidebarOpen: true,
         isMinimapOpen: true,
         isMobileMode: false,

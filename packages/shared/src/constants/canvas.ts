@@ -37,7 +37,7 @@ export const MIN_ACCOUNT_AGE_DAYS = 30;
 export const ZOOM = {
   MIN: 1,
   MAX: 40,
-  DEFAULT: 4,
+  DEFAULT: 10,  // 10x zoom = 10×10 screen pixels per canvas pixel (r/place style)
   DRAW: 20,
 } as const;
 
