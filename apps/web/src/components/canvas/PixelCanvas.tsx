@@ -53,9 +53,13 @@ export function PixelCanvas() {
       demoIndices[y * CANVAS_WIDTH + x] = color;
     }
 
-    useCanvasStore.getState().initializeCanvas(
-      btoa(String.fromCharCode(...packBitfield(demoIndices)))
-    );
+    // Convert packed bitfield to base64 without spread operator (avoids stack overflow)
+    const packed = packBitfield(demoIndices);
+    let binary = '';
+    for (let i = 0; i < packed.length; i++) {
+      binary += String.fromCharCode(packed[i]);
+    }
+    useCanvasStore.getState().initializeCanvas(btoa(binary));
   }, []);
 
   // Handle pixel placement

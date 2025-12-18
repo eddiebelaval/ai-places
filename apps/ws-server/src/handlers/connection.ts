@@ -45,24 +45,32 @@ export function send(ws: WebSocket, message: ServerMessage): void {
 /**
  * Handle a new WebSocket connection
  */
-export function handleConnection(
+export async function handleConnection(
   ws: WebSocket,
   req: IncomingMessage,
   ctx: ConnectionContext
-): void {
+): Promise<void> {
   let authenticatedUser: UserSession | null = null;
-  let authTimeout: NodeJS.Timeout | null = null;
 
-  // Require authentication within timeout
-  authTimeout = setTimeout(() => {
-    if (!authenticatedUser) {
-      send(ws, {
-        type: 'auth_error',
-        payload: { message: 'Authentication timeout' },
-      } as AuthErrorMessage);
-      ws.close(4001, 'Authentication timeout');
-    }
-  }, config.auth.timeoutMs);
+  console.log('New WebSocket connection established');
+
+  // Send initial canvas state immediately (allow anonymous viewing)
+  try {
+    const canvasService = new CanvasService(ctx.redis);
+    const canvasData = await canvasService.getFullCanvas();
+    send(ws, {
+      type: 'canvas_state',
+      payload: {
+        format: 'full',
+        data: canvasData,
+        version: 0,
+        timestamp: Date.now(),
+      },
+    } as CanvasStateMessage);
+    console.log('Sent initial canvas state');
+  } catch (err) {
+    console.error('Failed to send initial canvas state:', err);
+  }
 
   ws.on('message', async (data) => {
     try {
@@ -84,11 +92,6 @@ export function handleConnection(
         }
 
         authenticatedUser = JSON.parse(session) as UserSession;
-
-        if (authTimeout) {
-          clearTimeout(authTimeout);
-          authTimeout = null;
-        }
 
         // Add to clients map
         if (!ctx.clients.has(authenticatedUser.userId)) {
@@ -126,21 +129,8 @@ export function handleConnection(
         return;
       }
 
-      // All other messages require authentication
-      if (!authenticatedUser) {
-        send(ws, {
-          type: 'auth_error',
-          payload: { message: 'Not authenticated' },
-        } as AuthErrorMessage);
-        return;
-      }
-
-      // Route messages
+      // Route messages - some allowed without auth
       switch (message.type) {
-        case 'place_pixel':
-          await handlePlacePixel(ws, message, authenticatedUser, ctx);
-          break;
-
         case 'ping':
           send(ws, {
             type: 'pong',
@@ -148,7 +138,7 @@ export function handleConnection(
           } as PongMessage);
           break;
 
-        case 'get_canvas':
+        case 'get_canvas': {
           const canvasService = new CanvasService(ctx.redis);
           const canvasData = await canvasService.getFullCanvas();
           send(ws, {
@@ -161,6 +151,35 @@ export function handleConnection(
             },
           } as CanvasStateMessage);
           break;
+        }
+
+        case 'place_pixel':
+          // Require authentication for placing pixels
+          if (!authenticatedUser) {
+            send(ws, {
+              type: 'pixel_error',
+              payload: {
+                code: 'NOT_AUTHENTICATED',
+                message: 'You must be logged in to place pixels',
+              },
+            });
+            return;
+          }
+          await handlePlacePixel(ws, message, authenticatedUser, ctx);
+          break;
+
+        case 'join_faction':
+          // Require authentication for joining factions
+          if (!authenticatedUser) {
+            send(ws, {
+              type: 'auth_error',
+              payload: { message: 'Not authenticated' },
+            } as AuthErrorMessage);
+            return;
+          }
+          // TODO: Handle faction joining
+          console.log('Faction join requested:', message.payload.factionId);
+          break;
 
         default:
           console.warn('Unknown message type:', (message as any).type);
@@ -171,9 +190,7 @@ export function handleConnection(
   });
 
   ws.on('close', () => {
-    if (authTimeout) {
-      clearTimeout(authTimeout);
-    }
+    console.log('WebSocket connection closed');
 
     if (authenticatedUser) {
       const userSockets = ctx.clients.get(authenticatedUser.userId);

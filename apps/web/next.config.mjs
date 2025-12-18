@@ -2,8 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
 
-  // Transpile shared package
-  transpilePackages: ['@x-place/shared'],
+  // Note: @x-place/shared is pre-compiled to ESM in dist/
+  // No transpilePackages needed - resolves from node_modules
 
   // Image optimization
   images: {

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useUIStore } from '@/stores/ui-store';
+import { useWebSocket } from '@/hooks/useWebSocket';
 import { PixelCanvas } from '@/components/canvas/PixelCanvas';
 import { ColorPalette } from '@/components/ui/ColorPalette';
 import { CooldownTimer } from '@/components/ui/CooldownTimer';
@@ -11,6 +12,13 @@ import { cn } from '@/lib/utils';
 
 export function CanvasLayout() {
   const { isMobileMode, setMobileMode, isSidebarOpen, toggleSidebar } = useUIStore();
+
+  // Initialize WebSocket connection
+  const { placePixel } = useWebSocket({
+    onConnected: () => console.log('WebSocket connected!'),
+    onDisconnected: () => console.log('WebSocket disconnected'),
+    onError: (error) => console.error('WebSocket error:', error),
+  });
 
   // Detect mobile
   useEffect(() => {

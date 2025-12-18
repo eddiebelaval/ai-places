@@ -2,7 +2,7 @@
  * Color palette - 16 colors matching Reddit r/place
  */
 
-import type { ColorIndex } from '../types/canvas';
+import type { ColorIndex } from '../types/canvas.js';
 
 /** Hex color values indexed by color index */
 export const COLOR_PALETTE: Record<ColorIndex, string> = {

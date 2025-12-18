@@ -2,8 +2,8 @@
  * WebSocket message types for X-Place
  */
 
-import type { ColorIndex, PixelPlacement } from './canvas';
-import type { UserSession, LeaderboardEntry } from './user';
+import type { ColorIndex, PixelPlacement } from './canvas.js';
+import type { UserSession, LeaderboardEntry } from './user.js';
 
 // ============================================
 // CLIENT -> SERVER MESSAGES
