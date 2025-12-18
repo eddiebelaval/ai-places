@@ -54,34 +54,18 @@ export async function handleConnection(
 
   console.log('New WebSocket connection established');
 
-  // Send initial canvas state immediately (allow anonymous viewing)
-  try {
-    const canvasService = new CanvasService(ctx.redis);
-    const canvasData = await canvasService.getFullCanvas();
-    send(ws, {
-      type: 'canvas_state',
-      payload: {
-        format: 'full',
-        data: canvasData,
-        version: 0,
-        timestamp: Date.now(),
-      },
-    } as CanvasStateMessage);
-    console.log('Sent initial canvas state');
-  } catch (err) {
-    console.error('Failed to send initial canvas state:', err);
-  }
-
+  // IMPORTANT: Register message handler FIRST before any async operations
+  // This prevents race conditions where client sends messages before handler is ready
   ws.on('message', async (data) => {
     try {
       const message: ClientMessage = JSON.parse(data.toString());
 
       // Handle authentication
       if (message.type === 'authenticate') {
-        const session = await ctx.redis.get(
-          REDIS_KEYS.SESSION(message.payload.token)
-        );
-
+        const token = message.payload.token;
+        const redisKey = REDIS_KEYS.SESSION(token);
+          const session = await ctx.redis.get(redisKey);
+  
         if (!session) {
           send(ws, {
             type: 'auth_error',
@@ -207,4 +191,22 @@ export async function handleConnection(
   ws.on('error', (err) => {
     console.error('WebSocket error:', err);
   });
+
+  // Send initial canvas state (after handlers are registered)
+  try {
+    const canvasService = new CanvasService(ctx.redis);
+    const canvasData = await canvasService.getFullCanvas();
+    send(ws, {
+      type: 'canvas_state',
+      payload: {
+        format: 'full',
+        data: canvasData,
+        version: 0,
+        timestamp: Date.now(),
+      },
+    } as CanvasStateMessage);
+    console.log('Sent initial canvas state');
+  } catch (err) {
+    console.error('Failed to send initial canvas state:', err);
+  }
 }

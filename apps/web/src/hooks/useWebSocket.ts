@@ -261,6 +261,19 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     };
   }, [connect, disconnect, ping]);
 
+  // Re-authenticate when sessionToken changes (handles login after connection established)
+  useEffect(() => {
+    if (sessionToken && wsRef.current?.readyState === WebSocket.OPEN) {
+      console.log('[WS] Session token changed, re-authenticating...');
+      wsRef.current.send(
+        JSON.stringify({
+          type: 'authenticate',
+          payload: { token: sessionToken },
+        })
+      );
+    }
+  }, [sessionToken]);
+
   return {
     isConnected: wsRef.current?.readyState === WebSocket.OPEN,
     connect,
