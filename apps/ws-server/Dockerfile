@@ -23,16 +23,25 @@ RUN pnpm type-check
 WORKDIR /app/apps/ws-server
 RUN pnpm build
 
-# Production stage
-FROM node:20-alpine AS production
+# Production stage - use base with pnpm for workspace protocol support
+FROM base AS production
 WORKDIR /app
 
-# Copy built artifacts
-COPY --from=builder /app/apps/ws-server/dist ./dist
-COPY --from=builder /app/apps/ws-server/package.json ./
+# Copy workspace structure needed for pnpm to resolve workspace deps
+COPY --from=builder /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
 
-# Install production dependencies only
-RUN npm install --omit=dev
+# Copy shared package (needed for workspace resolution)
+COPY --from=builder /app/packages/shared ./packages/shared
+
+# Copy ws-server with built artifacts
+COPY --from=builder /app/apps/ws-server/dist ./apps/ws-server/dist
+COPY --from=builder /app/apps/ws-server/package.json ./apps/ws-server/
+
+# Install production dependencies only using pnpm
+WORKDIR /app/apps/ws-server
+RUN pnpm install --prod --frozen-lockfile
 
 # Set environment
 ENV NODE_ENV=production
