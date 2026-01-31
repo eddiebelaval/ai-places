@@ -10,7 +10,7 @@ interface EdgeTabProps {
 export function EdgeTab({ label, side, isActive, onClick }: EdgeTabProps) {
   const isLeft = side === 'left';
 
-  // Position classes
+  // Position classes - flat edge toward screen, rounded edge sticks out into content
   const positionClasses = isLeft
     ? 'left-0 rounded-r-lg border-l-0 rotate-180'
     : 'right-0 rounded-l-lg border-r-0';
