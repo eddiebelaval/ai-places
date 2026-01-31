@@ -90,7 +90,13 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
           case 'leaderboard_update':
             wsDebug.log(' Leaderboard update received');
-            // TODO: Update leaderboard store
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(
+                new CustomEvent('leaderboard_update', {
+                  detail: message.payload,
+                })
+              );
+            }
             break;
 
           case 'week_config':

@@ -22,7 +22,7 @@ function getSupabaseAdmin() {
   });
 }
 
-function getTwitterClient(): TwitterApi | null {
+async function getTwitterClient(): Promise<TwitterApi | null> {
   const appKey = process.env.X_API_KEY;
   const appSecret = process.env.X_API_SECRET;
   const accessToken = process.env.X_ACCESS_TOKEN;
@@ -41,7 +41,13 @@ function getTwitterClient(): TwitterApi | null {
     });
   }
 
-  return new TwitterApi({ appKey, appSecret });
+  try {
+    const appClient = new TwitterApi({ appKey, appSecret });
+    return await appClient.appLogin();
+  } catch (error) {
+    console.error('X verification: failed to initialize app client:', error);
+    return null;
+  }
 }
 
 export async function POST(
@@ -92,7 +98,7 @@ export async function POST(
     }
 
     // Verify ownership via X (Twitter) API
-    const twitterClient = getTwitterClient();
+    const twitterClient = await getTwitterClient();
     if (!twitterClient) {
       return NextResponse.json(
         { error: 'Verification unavailable. X API credentials not configured.' },

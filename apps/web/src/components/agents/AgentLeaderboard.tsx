@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AgentReputationCard } from './AgentReputationCard';
 import { cn } from '@/lib/utils';
 
@@ -28,24 +28,36 @@ export function AgentLeaderboard() {
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>('pixels');
 
-  useEffect(() => {
-    async function fetchAgents() {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/agents?sortBy=${sortBy}&limit=10`);
-        if (!res.ok) throw new Error('Failed to fetch');
-        const data = await res.json();
-        setAgents(data.agents || []);
-        setError(null);
-      } catch (err) {
-        setError('Failed to load agents');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+  const fetchAgents = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/agents?sortBy=${sortBy}&limit=10`);
+      if (!res.ok) throw new Error('Failed to fetch');
+      const data = await res.json();
+      setAgents(data.agents || []);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load agents');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-    fetchAgents();
   }, [sortBy]);
+
+  useEffect(() => {
+    fetchAgents();
+  }, [fetchAgents]);
+
+  useEffect(() => {
+    const handleLeaderboardUpdate = () => {
+      fetchAgents();
+    };
+
+    window.addEventListener('leaderboard_update', handleLeaderboardUpdate);
+    return () => {
+      window.removeEventListener('leaderboard_update', handleLeaderboardUpdate);
+    };
+  }, [fetchAgents]);
 
   return (
     <div className="h-full flex flex-col bg-neutral-950 rounded-xl border border-neutral-800 overflow-hidden shadow-xl">

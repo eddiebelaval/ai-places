@@ -51,6 +51,8 @@ export async function handleConnection(
   ctx: ConnectionContext
 ): Promise<void> {
   let authenticatedUser: UserSession | null = null;
+  let authenticatedSession: Record<string, unknown> | null = null;
+  let sessionToken: string | null = null;
 
   console.log('New WebSocket connection established');
 
@@ -64,7 +66,7 @@ export async function handleConnection(
       if (message.type === 'authenticate') {
         const token = message.payload.token;
         const redisKey = REDIS_KEYS.SESSION(token);
-          const session = await ctx.redis.get(redisKey);
+        const session = await ctx.redis.get(redisKey);
   
         if (!session) {
           send(ws, {
@@ -75,7 +77,9 @@ export async function handleConnection(
           return;
         }
 
-        authenticatedUser = JSON.parse(session) as UserSession;
+        authenticatedSession = JSON.parse(session) as Record<string, unknown>;
+        authenticatedUser = authenticatedSession as UserSession;
+        sessionToken = token;
 
         // Add to clients map
         if (!ctx.clients.has(authenticatedUser.userId)) {
@@ -161,8 +165,52 @@ export async function handleConnection(
             } as AuthErrorMessage);
             return;
           }
-          // TODO: Handle faction joining
-          console.log('Faction join requested:', message.payload.factionId);
+          if (!message.payload?.factionId || typeof message.payload.factionId !== 'string') {
+            send(ws, {
+              type: 'auth_error',
+              payload: { message: 'Invalid faction' },
+            } as AuthErrorMessage);
+            return;
+          }
+
+          const requestedFaction = message.payload.factionId.trim();
+          const isValidFaction = /^#?[a-zA-Z0-9_-]{2,32}$/.test(requestedFaction);
+          if (!isValidFaction) {
+            send(ws, {
+              type: 'auth_error',
+              payload: { message: 'Invalid faction format' },
+            } as AuthErrorMessage);
+            return;
+          }
+
+          authenticatedUser.factionId = requestedFaction;
+          if (authenticatedSession) {
+            authenticatedSession.factionId = requestedFaction;
+          }
+
+          if (sessionToken) {
+            const redisKey = REDIS_KEYS.SESSION(sessionToken);
+            try {
+              const ttl = await ctx.redis.ttl(redisKey);
+              const ttlSeconds = ttl > 0 ? ttl : 86400;
+              await ctx.redis.set(redisKey, JSON.stringify(authenticatedSession ?? authenticatedUser), {
+                ex: ttlSeconds,
+              });
+            } catch (error) {
+              console.error('Failed to persist faction selection:', error);
+            }
+          }
+
+          send(ws, {
+            type: 'authenticated',
+            payload: {
+              userId: authenticatedUser.userId,
+              username: authenticatedUser.xUsername,
+              factionId: authenticatedUser.factionId,
+              cooldownSeconds: authenticatedUser.cooldownSeconds,
+              isSpectatorOnly: authenticatedUser.isSpectatorOnly,
+            },
+          } as AuthenticatedMessage);
           break;
 
         default:

@@ -16,7 +16,7 @@
 | 4. Foundation Pour | ✅ Complete | Core canvas working, auth, WebSocket |
 | 5. Feature Blocks | ✅ Complete | V2 ecosystem features - all phases done |
 | 6. Integration Pass | ✅ Complete | Agent APIs, leaderboard snapshotting |
-| 7. Test Coverage | ✅ Complete | 131 tests passing, 84.6% agent parity |
+| 7. Test Coverage | ⏳ In Progress | 131 tests passing, E2E/CRUD pending |
 | 8. Polish & Harden | ✅ Complete | All audits passed, quick wins implemented |
 | 9. Launch Prep | ✅ Complete | Docs, analytics, launch content ready |
 | 10. Ship | ⏳ Pending | |
@@ -143,7 +143,7 @@ User → Next.js (Vercel) → WebSocket (Railway) → Redis (Upstash)
 
 ---
 
-## Stage 7: Test Coverage ✅
+## Stage 7: Test Coverage ⏳
 
 ### Checklist
 - [x] Unit tests for business logic (52 tests - canvas constants, cooldowns)
@@ -175,7 +175,7 @@ Agent API coverage: **84.6%** (11 of 13 applicable actions)
 ### Checkpoint Question
 > "Are all tests green and is coverage sufficient?"
 
-**Status:** Complete. 131 tests passing. E2E and CRUD tests deferred to post-launch iteration.
+**Status:** In progress. 131 tests passing. E2E and CRUD tests still pending.
 
 ---
 

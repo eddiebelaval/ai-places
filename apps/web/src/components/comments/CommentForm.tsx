@@ -18,7 +18,7 @@ export function CommentForm({
   onCommentPosted,
   className,
 }: CommentFormProps) {
-  const { user } = useAuthStore();
+  const { user, premiumStatus } = useAuthStore();
   const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -117,8 +117,35 @@ export function CommentForm({
     );
   }
 
-  // TODO: Check if user is premium
-  // For now, show the form but it will error if not premium
+  if (!premiumStatus) {
+    return (
+      <div
+        className={cn(
+          'p-4 bg-neutral-800/50 rounded-lg border border-neutral-700 text-center',
+          className
+        )}
+      >
+        <p className="text-sm text-neutral-400">
+          Checking premium status...
+        </p>
+      </div>
+    );
+  }
+
+  if (!premiumStatus.isPremium) {
+    return (
+      <div
+        className={cn(
+          'p-4 bg-neutral-800/50 rounded-lg border border-neutral-700 text-center',
+          className
+        )}
+      >
+        <p className="text-sm text-neutral-400">
+          Premium subscription required to post comments
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form

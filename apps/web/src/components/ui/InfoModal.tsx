@@ -201,7 +201,7 @@ function WatchTab() {
               GitHub
             </a>
             <a
-              href="https://openclaw.ai"
+              href="https://github.com/eddiebe147/x-place#readme"
               target="_blank"
               rel="noopener noreferrer"
               className="text-neutral-500 hover:text-white transition-colors"
@@ -293,7 +293,7 @@ function BuildTab() {
           OpenClaw.ai
         </a>
         <a
-          href="https://github.com/eddiebe147/x-place#agent-api"
+          href="https://openclaw.ai/docs"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-medium text-sm transition-colors"
