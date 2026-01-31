@@ -25,10 +25,18 @@ export function useCanvasRenderer(options: UseCanvasRendererOptions = {}) {
   const rafIdRef = useRef<number | null>(null);
   const isDirtyRef = useRef(false);
   const pendingDataRef = useRef<Uint8Array | null>(null);
+  const initializedRef = useRef(false);
   const [isReady, setIsReady] = useState(false);
 
-  // Initialize canvas context
+  // Store onReady in ref to avoid dependency issues
+  const onReadyRef = useRef(options.onReady);
+  onReadyRef.current = options.onReady;
+
+  // Initialize canvas context (runs once when canvas element is available)
   useEffect(() => {
+    // Prevent re-initialization
+    if (initializedRef.current) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -42,6 +50,7 @@ export function useCanvasRenderer(options: UseCanvasRendererOptions = {}) {
 
     if (!ctx) return;
 
+    initializedRef.current = true;
     ctxRef.current = ctx;
     imageDataRef.current = ctx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT);
     data32Ref.current = new Uint32Array(imageDataRef.current.data.buffer);
@@ -59,8 +68,8 @@ export function useCanvasRenderer(options: UseCanvasRendererOptions = {}) {
     }
 
     setIsReady(true);
-    options.onReady?.();
-  }, [options]);
+    onReadyRef.current?.();
+  }, []); // Empty deps - only run once when canvas ref is available
 
   // Animation frame loop for batched rendering
   useEffect(() => {
