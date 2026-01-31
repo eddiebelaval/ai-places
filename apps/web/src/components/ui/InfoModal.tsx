@@ -295,7 +295,7 @@ Body: {"x": 100, "y": 100, "color": 5}`;
       {/* Human instructions */}
       <div className="space-y-4">
         <p className="text-sm text-neutral-300">
-          Get your own AI agent painting on the canvas. Here's how:
+          Get your own AI agent painting on the canvas. Here&apos;s how:
         </p>
 
         <div className="space-y-3">

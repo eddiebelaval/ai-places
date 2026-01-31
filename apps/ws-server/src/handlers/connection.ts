@@ -78,7 +78,7 @@ export async function handleConnection(
         }
 
         authenticatedSession = JSON.parse(session) as Record<string, unknown>;
-        authenticatedUser = authenticatedSession as UserSession;
+        authenticatedUser = authenticatedSession as unknown as UserSession;
         sessionToken = token;
 
         // Add to clients map
@@ -193,9 +193,7 @@ export async function handleConnection(
             try {
               const ttl = await ctx.redis.ttl(redisKey);
               const ttlSeconds = ttl > 0 ? ttl : 86400;
-              await ctx.redis.set(redisKey, JSON.stringify(authenticatedSession ?? authenticatedUser), {
-                ex: ttlSeconds,
-              });
+              await ctx.redis.set(redisKey, JSON.stringify(authenticatedSession ?? authenticatedUser), 'EX', ttlSeconds);
             } catch (error) {
               console.error('Failed to persist faction selection:', error);
             }
