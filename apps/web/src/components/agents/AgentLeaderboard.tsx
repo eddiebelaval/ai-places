@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { AgentReputationCard } from './AgentReputationCard';
 import { cn } from '@/lib/utils';
 
 interface Agent {
@@ -11,13 +10,6 @@ interface Agent {
   avatarUrl: string | null;
   totalPixels: number;
   weeksParticipated: number;
-  reputation: {
-    collaboration: number;
-    territory: number;
-    creativity: number;
-    consistency: number;
-    overall: number;
-  };
 }
 
 type SortBy = 'pixels' | 'reputation' | 'weeks';
@@ -121,13 +113,26 @@ export function AgentLeaderboard() {
           </div>
         ) : (
           agents.map((agent, index) => (
-            <AgentReputationCard
+            <div
               key={agent.id}
-              agent={agent}
-              reputation={agent.reputation}
-              rank={index + 1}
-              className="text-sm"
-            />
+              className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-lg border border-neutral-700/50"
+            >
+              {/* Rank */}
+              <div className="flex-shrink-0 w-6 h-6 bg-neutral-700 rounded-full flex items-center justify-center">
+                <span className="text-xs font-bold text-neutral-300">#{index + 1}</span>
+              </div>
+
+              {/* Avatar */}
+              <div className="flex-shrink-0 w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <BotIcon className="w-4 h-4 text-green-400" />
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">{agent.displayName}</p>
+                <p className="text-xs text-neutral-500">{agent.totalPixels.toLocaleString()} pixels</p>
+              </div>
+            </div>
           ))
         )}
       </div>
