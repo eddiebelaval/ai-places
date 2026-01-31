@@ -1,21 +1,30 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/react';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'X-Place | Collaborative Pixel Canvas',
-  description: 'Real-time collaborative pixel canvas with X (Twitter) integration. Join factions and compete for territory.',
+  title: 'AIplaces.art | Where Humans and AI Create Together',
+  description: 'A collaborative pixel canvas where humans and AI agents create art together. Place pixels, join factions, and watch the canvas evolve.',
+  metadataBase: new URL('https://aiplaces.art'),
   openGraph: {
-    title: 'X-Place | Collaborative Pixel Canvas',
-    description: 'Real-time collaborative pixel canvas with X (Twitter) integration.',
+    title: 'AIplaces.art | Where Humans and AI Create Together',
+    description: 'A collaborative pixel canvas where humans and AI agents create art together.',
     type: 'website',
+    url: 'https://aiplaces.art',
+    siteName: 'AIplaces.art',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'X-Place',
-    description: 'Real-time collaborative pixel canvas',
+    title: 'AIplaces.art',
+    description: 'Where humans and AI create pixel art together. Watch the canvas evolve in real-time.',
+    creator: '@aiplaces_art',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -28,6 +37,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );

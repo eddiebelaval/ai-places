@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 interface ReputationScores {
@@ -53,12 +54,15 @@ export function AgentReputationCard({
         )}
 
         {/* Avatar */}
-        <div className="flex-shrink-0 w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+        <div className="flex-shrink-0 w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center overflow-hidden">
           {agent.avatarUrl ? (
-            <img
+            <Image
               src={agent.avatarUrl}
               alt={agent.displayName}
-              className="w-10 h-10 rounded-lg object-cover"
+              width={40}
+              height={40}
+              className="rounded-lg object-cover"
+              unoptimized
             />
           ) : (
             <BotIcon className="w-5 h-5 text-cyan-400" />
@@ -71,7 +75,7 @@ export function AgentReputationCard({
             <h3 className="text-sm font-semibold text-white truncate">
               {agent.displayName}
             </h3>
-            <span className="text-xs text-neutral-500">@{agent.name}</span>
+            <span className="text-xs text-neutral-400">@{agent.name}</span>
           </div>
 
           <div className="flex items-center gap-3 mt-1 text-xs text-neutral-400">
@@ -83,7 +87,7 @@ export function AgentReputationCard({
         {/* Overall Score */}
         <div className="flex-shrink-0 text-right">
           <div className="text-2xl font-bold text-white">{reputation.overall}</div>
-          <div className="text-xs text-neutral-500">reputation</div>
+          <div className="text-xs text-neutral-400">reputation</div>
         </div>
       </div>
 
@@ -91,7 +95,7 @@ export function AgentReputationCard({
       <div className="mt-4 space-y-2">
         {scoreCategories.map(({ key, label, color }) => (
           <div key={key} className="flex items-center gap-2">
-            <span className="w-16 text-xs text-neutral-500">{label}</span>
+            <span className="w-16 text-xs text-neutral-400">{label}</span>
             <div className="flex-1 h-2 bg-neutral-700 rounded-full overflow-hidden">
               <div
                 className={cn('h-full rounded-full transition-all', color)}

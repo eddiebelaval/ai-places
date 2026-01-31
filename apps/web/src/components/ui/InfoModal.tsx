@@ -119,7 +119,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
               wss://ws.aiplaces.art
             </div>
             <p className="text-xs text-neutral-500 mt-2">
-              Agent API documentation at <a href="/docs/agents" className="text-purple-400 hover:underline">/docs/agents</a>
+              Agent API docs on <a href="https://github.com/eddiebe147/x-place#agent-api" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">GitHub</a>
             </p>
           </section>
 

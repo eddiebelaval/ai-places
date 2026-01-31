@@ -15,19 +15,43 @@ export async function GET(): Promise<NextResponse> {
   try {
     const redis = getRedis();
 
-    // Try to get existing week config from Redis
-    const configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+    if (!redis) {
+      console.error('Week API: Redis client not available');
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+
+    // Try to get existing week config from Redis with error handling
+    let configStr: string | null = null;
+    try {
+      configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+    } catch (redisError) {
+      console.error('Week API: Redis GET error:', redisError);
+      // Fall through to create default config
+    }
 
     let config: WeekConfig;
 
     if (configStr && typeof configStr === 'string') {
-      config = JSON.parse(configStr);
+      try {
+        config = JSON.parse(configStr);
+      } catch (parseError) {
+        console.error('Week API: Failed to parse config from Redis, creating new:', parseError);
+        config = createWeekConfig();
+      }
     } else {
       // No config exists - create initial one
       config = createWeekConfig();
 
-      // Store it in Redis
-      await redis.set(REDIS_KEYS.WEEK_CONFIG, JSON.stringify(config));
+      // Store it in Redis (non-blocking)
+      try {
+        await redis.set(REDIS_KEYS.WEEK_CONFIG, JSON.stringify(config));
+      } catch (setError) {
+        console.warn('Week API: Failed to cache week config:', setError);
+        // Continue - not critical
+      }
     }
 
     // Calculate time until reset
@@ -41,7 +65,8 @@ export async function GET(): Promise<NextResponse> {
       serverTime: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Failed to get week config:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Week API error:', { message: errorMessage });
     return NextResponse.json(
       { error: 'Failed to get week configuration' },
       { status: 500 }

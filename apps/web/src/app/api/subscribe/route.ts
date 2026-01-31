@@ -31,7 +31,16 @@ function isValidEmail(email: string): boolean {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    const body = await request.json();
+    // Parse request body with error handling
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
     const { email, userId, username } = body;
 
     // Validate input
@@ -56,7 +65,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const supabase = getSupabaseAdmin();
+    let supabase;
+    try {
+      supabase = getSupabaseAdmin();
+    } catch {
+      console.error('Subscribe API: Missing Supabase credentials');
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     // Check if user already has a verified email
     const { data: existingProfile } = await supabase
@@ -159,7 +177,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       message: 'Verification email sent! Check your inbox.',
     });
   } catch (error) {
-    console.error('Subscribe error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Subscribe API: Unexpected error:', { message: errorMessage });
     return NextResponse.json(
       { error: 'An unexpected error occurred' },
       { status: 500 }

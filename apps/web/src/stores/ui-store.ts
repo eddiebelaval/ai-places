@@ -30,6 +30,9 @@ interface UIState {
   /** WebSocket connection status */
   isConnected: boolean;
 
+  /** Reconnection attempt count (0 = first connect or stable connection) */
+  reconnectAttempts: number;
+
   /** Actions */
   setSelectedColor: (color: ColorIndex) => void;
   setCoordinates: (x: number, y: number) => void;
@@ -41,6 +44,7 @@ interface UIState {
   clearCooldown: () => void;
   setHoveredPixel: (pixel: { x: number; y: number } | null) => void;
   setConnected: (connected: boolean) => void;
+  setReconnectAttempts: (attempts: number) => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -57,6 +61,7 @@ export const useUIStore = create<UIState>()(
         cooldownEnd: null,
         hoveredPixel: null,
         isConnected: false,
+        reconnectAttempts: 0,
 
         setSelectedColor: (color) => {
           set((state) => {
@@ -119,6 +124,15 @@ export const useUIStore = create<UIState>()(
         setConnected: (connected) => {
           set((state) => {
             state.isConnected = connected;
+            if (connected) {
+              state.reconnectAttempts = 0;
+            }
+          });
+        },
+
+        setReconnectAttempts: (attempts) => {
+          set((state) => {
+            state.reconnectAttempts = attempts;
           });
         },
       })),

@@ -30,10 +30,45 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Optional week/year override (defaults to current)
     const now = new Date();
-    const weekNumber = parseInt(searchParams.get('week') || String(getISOWeekNumber(now)), 10);
-    const year = parseInt(searchParams.get('year') || String(now.getFullYear()), 10);
+    const weekParam = searchParams.get('week');
+    const yearParam = searchParams.get('year');
 
-    const supabase = getSupabaseAdmin();
+    // Validate week parameter (1-53)
+    let weekNumber = getISOWeekNumber(now);
+    if (weekParam) {
+      const parsed = parseInt(weekParam, 10);
+      if (isNaN(parsed) || parsed < 1 || parsed > 53) {
+        return NextResponse.json(
+          { error: 'Invalid week parameter. Must be between 1 and 53.' },
+          { status: 400 }
+        );
+      }
+      weekNumber = parsed;
+    }
+
+    // Validate year parameter (reasonable range)
+    let year = now.getFullYear();
+    if (yearParam) {
+      const parsed = parseInt(yearParam, 10);
+      if (isNaN(parsed) || parsed < 2020 || parsed > 2100) {
+        return NextResponse.json(
+          { error: 'Invalid year parameter. Must be between 2020 and 2100.' },
+          { status: 400 }
+        );
+      }
+      year = parsed;
+    }
+
+    let supabase;
+    try {
+      supabase = getSupabaseAdmin();
+    } catch {
+      console.error('Objectives API: Missing Supabase credentials');
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     // Get or create weekly objectives using the function
     const { data: objectives, error: objError } = await supabase
@@ -142,9 +177,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       objectives: transformedObjectives,
     });
   } catch (error) {
-    console.error('Objectives error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Objectives API: Unexpected error:', { message: errorMessage });
     return NextResponse.json(
-      { error: 'Failed to fetch objectives' },
+      { error: 'An unexpected error occurred' },
       { status: 500 }
     );
   }

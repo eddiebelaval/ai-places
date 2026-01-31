@@ -49,13 +49,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const supabase = getSupabaseAdmin();
+    let supabase;
+    try {
+      supabase = getSupabaseAdmin();
+    } catch {
+      console.error('Pixel API: Missing Supabase credentials');
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     // Find agent by hashed API key
+    // Using actual schema columns: id, name, status (not display_name, is_active)
     const hashedKey = hashApiKey(apiKey);
     const { data: agent, error: agentError } = await supabase
       .from('agents')
-      .select('id, name, display_name, is_active')
+      .select('id, name, status')
       .eq('api_key_hash', hashedKey)
       .single();
 
@@ -66,7 +76,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    if (!agent.is_active) {
+    if (agent.status !== 'active') {
       return NextResponse.json(
         { error: 'Agent is disabled' },
         { status: 403 }
@@ -74,7 +84,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // 2. Parse and validate request body
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
     const { x, y, color } = body;
 
     // Validate coordinates
@@ -109,13 +127,35 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // 3. Check cooldown
     const redis = getRedis();
+    if (!redis) {
+      console.error('Pixel API: Redis client not available');
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+
+    let cooldownValue: string | null = null;
     const cooldownKey = REDIS_KEYS.COOLDOWN_AGENT(agent.id);
-    const cooldownValue = await redis.get(cooldownKey);
+    try {
+      cooldownValue = await redis.get(cooldownKey);
+    } catch (redisError) {
+      console.error('Pixel API: Redis cooldown check failed:', redisError);
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     if (cooldownValue) {
       // Get TTL to report remaining cooldown
-      const ttl = await redis.pttl(cooldownKey);
-      const remainingMs = ttl > 0 ? ttl : AGENT_COOLDOWN_MS;
+      let remainingMs = AGENT_COOLDOWN_MS;
+      try {
+        const ttl = await redis.pttl(cooldownKey);
+        remainingMs = ttl > 0 ? ttl : AGENT_COOLDOWN_MS;
+      } catch {
+        // Use default cooldown if TTL check fails
+      }
 
       return NextResponse.json(
         {
@@ -129,25 +169,43 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // 4. Update canvas using bitfield operation
     // Upstash Redis uses a fluent builder pattern for bitfield commands
     const bitOffset = (y * CANVAS_WIDTH + x) * BITS_PER_PIXEL;
-    await redis
-      .bitfield(REDIS_KEYS.CANVAS_STATE)
-      .set('u4', bitOffset, color)
-      .exec();
+    try {
+      await redis
+        .bitfield(REDIS_KEYS.CANVAS_STATE)
+        .set('u4', bitOffset, color)
+        .exec();
+    } catch (canvasError) {
+      console.error('Pixel API: Failed to update canvas:', canvasError);
+      return NextResponse.json(
+        { error: 'Failed to place pixel on canvas' },
+        { status: 500 }
+      );
+    }
 
-    // 5. Set cooldown
-    await redis.set(cooldownKey, Date.now().toString(), {
-      px: AGENT_COOLDOWN_MS,
-    });
+    // 5. Set cooldown (non-critical - continue on failure)
+    try {
+      await redis.set(cooldownKey, Date.now().toString(), {
+        px: AGENT_COOLDOWN_MS,
+      });
+    } catch (cooldownSetError) {
+      console.warn('Pixel API: Failed to set cooldown:', cooldownSetError);
+      // Continue - pixel was placed successfully
+    }
 
-    // 6. Update stats
-    // Increment agent leaderboard
-    await redis.zincrby(REDIS_KEYS.LEADERBOARD_AGENTS, 1, agent.id);
+    // 6. Update stats (non-critical - continue on failures)
+    try {
+      // Increment agent leaderboard
+      await redis.zincrby(REDIS_KEYS.LEADERBOARD_AGENTS, 1, agent.id);
 
-    // Increment agent's weekly pixel count
-    await redis.incr(REDIS_KEYS.WEEKLY_PIXELS_AGENT(agent.id));
+      // Increment agent's weekly pixel count
+      await redis.incr(REDIS_KEYS.WEEKLY_PIXELS_AGENT(agent.id));
 
-    // Add agent to weekly contributors set (with agent: prefix to distinguish)
-    await redis.sadd(REDIS_KEYS.WEEKLY_CONTRIBUTORS, `agent:${agent.id}`);
+      // Add agent to weekly contributors set (with agent: prefix to distinguish)
+      await redis.sadd(REDIS_KEYS.WEEKLY_CONTRIBUTORS, `agent:${agent.id}`);
+    } catch (statsError) {
+      console.warn('Pixel API: Failed to update stats:', statsError);
+      // Continue - pixel was placed successfully
+    }
 
     console.log(
       `Agent pixel placed by ${agent.name} at (${x}, ${y}) color ${color}`

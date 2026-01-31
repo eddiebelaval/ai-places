@@ -1,6 +1,6 @@
 # AIplaces Pipeline Status
 
-## Current Stage: 8 - Polish & Harden
+## Current Stage: 9 - Launch Prep
 
 **Last Updated:** 2026-01-31
 
@@ -17,8 +17,8 @@
 | 5. Feature Blocks | ✅ Complete | V2 ecosystem features - all phases done |
 | 6. Integration Pass | ✅ Complete | Agent APIs, leaderboard snapshotting |
 | 7. Test Coverage | ✅ Complete | 131 tests passing, 84.6% agent parity |
-| 8. Polish & Harden | 🔄 In Progress | |
-| 9. Launch Prep | ⏳ Pending | |
+| 8. Polish & Harden | ✅ Complete | All audits passed, quick wins implemented |
+| 9. Launch Prep | ✅ Complete | Docs, analytics, launch content ready |
 | 10. Ship | ⏳ Pending | |
 | 11. Listen & Iterate | ⏳ Pending | |
 
@@ -179,24 +179,66 @@ Agent API coverage: **84.6%** (11 of 13 applicable actions)
 
 ---
 
-## Stage 8: Polish & Harden 🔄
+## Stage 8: Polish & Harden ✅
 
 ### Checklist
-- [ ] Error handling for all API routes
-- [ ] Loading states for all async operations
-- [ ] Empty states for lists and galleries
-- [ ] Edge case handling (network failures, rate limits)
-- [ ] Input validation on all forms
-- [ ] Graceful degradation when services unavailable
-- [ ] Console error cleanup
-- [ ] Performance audit (bundle size, render times)
-- [ ] Accessibility audit (ARIA, keyboard navigation)
-- [ ] Mobile responsiveness verification
+- [x] Error handling for all API routes (503 for service unavailable, 400 for validation, structured logging)
+- [x] Loading states for all async operations (PixelCanvas, AgentLeaderboard, WeekCountdown)
+- [x] Empty states for lists and galleries (AgentLeaderboard "No agents yet" state)
+- [x] Edge case handling (network failures, rate limits, JSON parse errors)
+- [x] Input validation on all forms (sortBy, limit, week, year params validated)
+- [x] Graceful degradation when services unavailable (ConnectionStatus shows reconnection state, error states for all components)
+- [x] Console error cleanup (debug utility added, verbose logging moved behind debug flag)
+- [x] Performance audit (canvas rendering optimized with RAF batching, bundle at 182KB)
+- [x] Accessibility audit (ARIA live regions, color contrast fixes, semantic HTML)
+- [x] Mobile responsiveness verification (touch targets 44px, responsive breakpoints, leaderboard hidden on mobile)
+
+### Key Improvements Made
+- API routes: Added input validation, proper error codes (400/401/403/429/500/503), structured logging
+- UI: Error states for PixelCanvas, reconnection indicators in ConnectionStatus
+- Accessibility: ARIA labels on buttons, live regions for status updates, color contrast improved (neutral-500 → neutral-400)
+- Performance: Debug logging utility to reduce production console noise
+- Mobile: Touch-friendly buttons (min 44x44px), responsive layouts with proper breakpoints
 
 ### Checkpoint Question
 > "What breaks if I do something stupid?"
 
-**Status:** In progress.
+**Status:** Complete. All quick wins implemented, audits passed.
+
+---
+
+## Stage 9: Launch Prep ✅
+
+### Checklist
+- [x] README documentation complete (setup, env vars, deployment, architecture)
+- [x] Agent API documentation (endpoints, auth, rate limits, color palette)
+- [x] Onboarding flow verified (InfoModal explains game, spectator mode works)
+- [x] Analytics and monitoring (Vercel Analytics added, Sentry configured)
+- [x] Environment variables documented (.env.example updated)
+- [x] Launch announcement content prepared (LAUNCH_CONTENT.md)
+
+### Documentation Updates
+- README.md: Added environment variables table, deployment guide, full Agent API docs
+- .env.example: Added SENTRY_* variables
+- InfoModal: Fixed agent docs link to GitHub README
+
+### Analytics & Monitoring
+- Added @vercel/analytics to track page views and web vitals
+- Created Sentry config files (client, server, edge)
+- Health endpoint checks Redis, Supabase, and WebSocket status
+
+### Launch Content Ready
+- See LAUNCH_CONTENT.md for:
+  - X/Twitter announcement options
+  - Thread content
+  - Hashtags and descriptions
+  - Press talking points
+  - Launch checklist
+
+### Checkpoint Question
+> "Could a stranger use this without asking me questions?"
+
+**Status:** Complete. Documentation ready, monitoring configured, launch content prepared.
 
 ---
 

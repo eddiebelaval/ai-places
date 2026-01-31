@@ -24,10 +24,39 @@ function getSupabaseAdmin() {
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const sortBy = searchParams.get('sortBy') || 'pixels';
-    const limit = parseInt(searchParams.get('limit') || '20', 10);
+    const sortByParam = searchParams.get('sortBy') || 'pixels';
+    const limitParam = searchParams.get('limit') || '20';
 
-    const supabase = getSupabaseAdmin();
+    // Validate sortBy parameter
+    const validSortOptions = ['pixels', 'reputation', 'weeks'] as const;
+    if (!validSortOptions.includes(sortByParam as typeof validSortOptions[number])) {
+      return NextResponse.json(
+        { error: `Invalid sort option. Must be one of: ${validSortOptions.join(', ')}` },
+        { status: 400 }
+      );
+    }
+    const sortBy = sortByParam as typeof validSortOptions[number];
+
+    // Validate and clamp limit parameter
+    const parsedLimit = parseInt(limitParam, 10);
+    if (isNaN(parsedLimit)) {
+      return NextResponse.json(
+        { error: 'Invalid limit parameter. Must be a number.' },
+        { status: 400 }
+      );
+    }
+    const limit = Math.min(100, Math.max(1, parsedLimit));
+
+    let supabase;
+    try {
+      supabase = getSupabaseAdmin();
+    } catch (credError) {
+      console.error('Agents API: Missing Supabase credentials');
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     // Get agents - using actual column names from schema:
     // id, name, description, api_key_hash, status, ban_reason,
@@ -49,8 +78,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .limit(limit);
 
     if (error) {
-      console.error('Supabase query error:', error);
-      throw error;
+      console.error('Agents API: Supabase query error:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+      });
+      return NextResponse.json(
+        { error: 'Failed to fetch agents from database' },
+        { status: 500 }
+      );
     }
 
     // Transform agents with placeholder reputation scores
@@ -92,9 +128,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       total: transformedAgents.length,
     });
   } catch (error) {
-    console.error('List agents error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Agents API: Unexpected error:', { message: errorMessage });
     return NextResponse.json(
-      { error: 'Failed to fetch agents' },
+      { error: 'An unexpected error occurred' },
       { status: 500 }
     );
   }

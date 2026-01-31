@@ -7,6 +7,7 @@ import { useCanvasRenderer } from '@/hooks/useCanvasRenderer';
 import { usePanZoom } from '@/hooks/usePanZoom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, ColorIndex } from '@aiplaces/shared';
 import { cn } from '@/lib/utils';
+import { debug } from '@/lib/debug';
 
 interface PixelCanvasProps {
   /** Optional callback for pixel placement (only for authenticated non-spectator users) */
@@ -16,7 +17,7 @@ interface PixelCanvasProps {
 export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { colorIndices, updatePixel, isLoading } = useCanvasStore();
+  const { colorIndices, updatePixel, isLoading, error: canvasError } = useCanvasStore();
   const {
     selectedColor,
     setCoordinates,
@@ -26,7 +27,7 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
   } = useUIStore();
 
   const { canvasRef, renderInitialState, queuePixelUpdate } = useCanvasRenderer({
-    onReady: () => console.log('Canvas renderer ready'),
+    onReady: () => debug.log('Canvas renderer ready'),
   });
 
   const { viewport, getCanvasCoords, isDragging } = usePanZoom({
@@ -67,7 +68,7 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
       // Set cooldown (5 seconds for demo)
       setCooldown(Date.now() + 5000);
 
-      console.log(`Placed pixel at (${coords.x}, ${coords.y}) with color ${selectedColor}`);
+      debug.log(`Placed pixel at (${coords.x}, ${coords.y}) with color ${selectedColor}`);
     },
     [
       isDragging,
@@ -99,8 +100,26 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
       role="img"
       aria-label={`Pixel canvas, ${CANVAS_WIDTH} by ${CANVAS_HEIGHT} pixels. Use arrow keys to pan, plus and minus to zoom, zero to reset view.`}
     >
+      {/* Error state */}
+      {canvasError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/90 z-50">
+          <div className="flex flex-col items-center gap-4 text-center px-4">
+            <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+              <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-red-400 font-medium">Canvas unavailable</p>
+              <p className="text-neutral-500 text-sm mt-1">{canvasError}</p>
+              <p className="text-neutral-600 text-xs mt-2">Waiting for reconnection...</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Loading state */}
-      {isLoading && (
+      {isLoading && !canvasError && (
         <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/80 z-50">
           <div className="flex flex-col items-center gap-4">
             <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
