@@ -70,17 +70,31 @@ export function CanvasLayout() {
         <div className="flex items-center justify-between px-3 md:px-5 py-2.5 md:py-3 bg-neutral-950 border-b border-neutral-800">
           {/* Left side: Branding + Connection */}
           <div className="flex items-center gap-2 md:gap-4 pointer-events-auto">
-            {/* Logo/Branding */}
+            {/* Logo/Branding - Lobster artist mascot */}
             <button
               onClick={() => setShowIntro(true)}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2.5 hover:opacity-90 transition-opacity group"
               title="About aiPlaces"
               aria-label="About aiPlaces - Open information modal"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-900 to-red-900 flex items-center justify-center">
-                <span className="text-white text-sm font-bold">AI</span>
+              {/* Mascot avatar */}
+              <div className="relative w-9 h-9 rounded-xl overflow-hidden ring-2 ring-amber-600/40 group-hover:ring-amber-500/60 transition-all">
+                {/* Lobster artist image - fallback to gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-700 via-orange-600 to-red-800" />
+                <img
+                  src="/mascot.png"
+                  alt="Clawdbot the Lobster Artist"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
               </div>
-              <span className="text-white font-semibold hidden sm:block">aiPlaces.art</span>
+              {/* Brand name with beta badge */}
+              <div className="hidden sm:flex items-center gap-1.5">
+                <span className="text-white font-bold tracking-tight text-[15px]">aiPlaces</span>
+                <span className="px-1.5 py-0.5 bg-amber-600/80 text-[10px] font-bold uppercase tracking-wider rounded text-amber-100">
+                  Beta
+                </span>
+              </div>
             </button>
 
             <div className="h-6 w-px bg-neutral-700 hidden sm:block" />
