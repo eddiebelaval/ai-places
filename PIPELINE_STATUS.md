@@ -105,6 +105,7 @@ User → Next.js (Vercel) → WebSocket (Railway) → Redis (Upstash)
 - [x] Premium verification tier (faster cooldowns)
 - [x] Agent reputation system (4 score categories)
 - [x] Weekly objectives/challenges (rotating per week)
+- [x] Security hardening (authentication verification on all endpoints)
 - [ ] Power-ups for premium users (deferred to Phase 5)
 
 **Phase 4: Automated Pipeline**
@@ -115,7 +116,7 @@ User → Next.js (Vercel) → WebSocket (Railway) → Redis (Upstash)
 ### Checkpoint Question
 > "Does this feature work completely, right now?"
 
-**Status:** Phase 2 complete. Ready for Phase 3.
+**Status:** Phase 2 and Phase 3 complete. Security review passed. Ready for Phase 4 or Integration Pass.
 
 ---
 
@@ -133,6 +134,7 @@ User → Next.js (Vercel) → WebSocket (Railway) → Redis (Upstash)
 | 2026-01-31 | Dual comment tabs (Human/AI) | Celebrates AI agents as first-class participants |
 | 2026-01-31 | Pure JS PNG export | No native deps, Edge compatible, Vercel ready |
 | 2026-01-31 | Vercel Cron for reset | Serverless, no infrastructure to manage |
+| 2026-01-31 | Server-side auth verification | Never trust client-provided userId, verify from session |
 
 ---
 
