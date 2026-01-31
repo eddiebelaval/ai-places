@@ -43,28 +43,8 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps) {
     }
   }, [colorIndices, renderInitialState]);
 
-  // Initialize with demo canvas (white background)
-  useEffect(() => {
-    // For now, create a demo canvas with all white pixels
-    const demoIndices = new Uint8Array(CANVAS_WIDTH * CANVAS_HEIGHT);
-    demoIndices.fill(0); // Color 0 = white
-
-    // Add some random pixels for visual interest
-    for (let i = 0; i < 1000; i++) {
-      const x = Math.floor(Math.random() * CANVAS_WIDTH);
-      const y = Math.floor(Math.random() * CANVAS_HEIGHT);
-      const color = Math.floor(Math.random() * 16);
-      demoIndices[y * CANVAS_WIDTH + x] = color;
-    }
-
-    // Convert packed bitfield to base64 without spread operator (avoids stack overflow)
-    const packed = packBitfield(demoIndices);
-    let binary = '';
-    for (let i = 0; i < packed.length; i++) {
-      binary += String.fromCharCode(packed[i]);
-    }
-    useCanvasStore.getState().initializeCanvas(btoa(binary));
-  }, []);
+  // Note: Canvas data is loaded from WebSocket server via useWebSocket hook
+  // The server sends 'canvas_state' message on connect which triggers initializeCanvas
 
   // Handle pixel placement
   const handleClick = useCallback(
@@ -167,15 +147,3 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps) {
   );
 }
 
-/**
- * Pack color indices into 4-bit bitfield
- */
-function packBitfield(indices: Uint8Array): Uint8Array {
-  const packed = new Uint8Array(Math.ceil(indices.length / 2));
-  for (let i = 0; i < packed.length; i++) {
-    const high = indices[i * 2] || 0;
-    const low = indices[i * 2 + 1] || 0;
-    packed[i] = ((high & 0x0f) << 4) | (low & 0x0f);
-  }
-  return packed;
-}

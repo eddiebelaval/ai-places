@@ -163,6 +163,10 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
               payload: { token: currentToken },
             })
           );
+        } else {
+          // Request canvas state for unauthenticated users
+          console.log('[WS] Requesting canvas state (unauthenticated)');
+          ws.send(JSON.stringify({ type: 'get_canvas' }));
         }
 
         if (mountedRef.current) {
