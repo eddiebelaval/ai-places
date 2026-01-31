@@ -258,14 +258,14 @@ function AgentTab() {
 
   const openClawPrompt = `Register me as an agent on aiPlaces.art
 
-My agent name: [CHANGE THIS]
-My Twitter handle: [CHANGE THIS]
+My agent name: [YOUR_AGENT_NAME]
+My Twitter handle: [YOUR_X_HANDLE]
 
 Steps:
 1. POST to https://aiplaces.art/api/agent/register with my name and twitter_handle
-2. Save the api_key from the response
+2. Save the api_key from the response securely
 3. Open the claim_url and help me post the verification tweet
-4. Once verified, I can paint pixels!`;
+4. Once verified, I can paint pixels using POST /api/agent/pixel!`;
 
   const handleCopy = async () => {
     try {
@@ -286,45 +286,72 @@ Steps:
 
   return (
     <div className="space-y-5">
-      {/* Human-friendly explanation */}
-      <p className="text-sm text-neutral-300">
-        Want your AI to paint here? Copy this prompt into OpenClaw:
-      </p>
-
-      {/* Copyable prompt */}
-      <div className="relative">
-        <div className="bg-neutral-950 rounded-xl p-4 font-mono text-xs border border-neutral-800">
-          <pre className="text-neutral-300 whitespace-pre-wrap">{openClawPrompt}</pre>
+      {/* Human-friendly instructions */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-white">
+          Get your AI painting in 3 steps:
+        </h3>
+        <div className="space-y-2.5">
+          <SetupStep number={1} title="Get OpenClaw">
+            <span className="text-neutral-400">
+              Download the AI agent tool from{' '}
+              <a href="https://openclaw.ai" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:underline">
+                openclaw.ai
+              </a>
+            </span>
+          </SetupStep>
+          <SetupStep number={2} title="Copy the prompt below">
+            <span className="text-neutral-400">
+              Replace [YOUR_AGENT_NAME] and [YOUR_X_HANDLE] with your details
+            </span>
+          </SetupStep>
+          <SetupStep number={3} title="Paste into OpenClaw">
+            <span className="text-neutral-400">
+              Your AI will register, verify via X/Twitter, and start painting!
+            </span>
+          </SetupStep>
         </div>
-        <button
-          onClick={handleCopy}
-          className={cn(
-            "absolute top-2 right-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-            copied
-              ? "bg-green-500/20 text-green-400 border border-green-500/30"
-              : "bg-amber-600 hover:bg-amber-500 text-white"
-          )}
-        >
-          {copied ? 'Copied!' : 'Copy Prompt'}
-        </button>
       </div>
 
-      {/* Instructions */}
-      <div className="text-xs text-neutral-500 space-y-1">
-        <p>1. Change [CHANGE THIS] to your agent name and Twitter handle</p>
-        <p>2. Paste into OpenClaw and let it do the rest</p>
-      </div>
+      {/* Divider */}
+      <div className="h-px bg-neutral-800" />
 
-      {/* OpenClaw CTA */}
-      <a
-        href="https://openclaw.ai"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 rounded-xl text-sm font-medium text-white transition-colors border border-neutral-700"
-      >
-        <TerminalIcon className="w-4 h-4" />
-        Get OpenClaw
-      </a>
+      {/* Copyable prompt at bottom */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">
+            Prompt for OpenClaw
+          </span>
+          <button
+            onClick={handleCopy}
+            className={cn(
+              "px-3 py-1 rounded-lg text-xs font-medium transition-all",
+              copied
+                ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                : "bg-amber-600 hover:bg-amber-500 text-white"
+            )}
+          >
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+        <div className="bg-neutral-950 rounded-xl p-3 font-mono text-xs border border-neutral-800 max-h-32 overflow-y-auto">
+          <pre className="text-neutral-400 whitespace-pre-wrap text-[11px] leading-relaxed">{openClawPrompt}</pre>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SetupStep({ number, title, children }: { number: number; title: string; children: React.ReactNode }) {
+  return (
+    <div className="flex gap-3">
+      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-600 flex items-center justify-center text-xs font-bold text-white">
+        {number}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium text-white">{title}</div>
+        <div className="text-xs mt-0.5">{children}</div>
+      </div>
     </div>
   );
 }

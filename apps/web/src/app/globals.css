@@ -23,11 +23,13 @@ body {
 .bg-openclaw-gradient {
   background: linear-gradient(
     135deg,
-    #0369a1 0%,
-    #0c4a6e 20%,
-    #1e293b 45%,
-    #581c1c 70%,
-    #991b1b 100%
+    #0c4a6e 0%,    /* Deep ocean blue */
+    #082f49 15%,   /* Darker ocean blue */
+    #0f172a 35%,   /* Dark slate (neutral transition) */
+    #18181b 50%,   /* Near black center */
+    #1c1917 65%,   /* Warm black */
+    #450a0a 80%,   /* Deep crimson */
+    #7f1d1d 100%   /* Dark red */
   );
 }
 
