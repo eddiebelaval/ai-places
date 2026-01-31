@@ -18,13 +18,10 @@ const STORAGE_KEY = 'aiplaces_intro_seen';
 export function CanvasLayout() {
   const [showIntro, setShowIntro] = useState(false);
   const [introTab, setIntroTab] = useState<'watch' | 'rules' | 'agent'>('watch');
-  // Hide leaderboard by default on mobile (< 768px)
-  const [showLeaderboard, setShowLeaderboard] = useState(
-    typeof window !== 'undefined' ? window.innerWidth >= 768 : true
-  );
-  const [showActivityFeed, setShowActivityFeed] = useState(
-    typeof window !== 'undefined' ? window.innerWidth >= 768 : true
-  );
+  const [showMobileNav, setShowMobileNav] = useState(false);
+  // Hide sidebars by default - CSS will show on desktop
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showActivityFeed, setShowActivityFeed] = useState(false);
 
   // Show intro modal on first visit
   useEffect(() => {
@@ -80,7 +77,7 @@ export function CanvasLayout() {
             {/* Logo/Branding - Lobster artist mascot */}
             <button
               onClick={() => setShowIntro(true)}
-              className="flex items-center gap-2.5 hover:opacity-90 transition-opacity group"
+              className="flex items-center gap-2 hover:opacity-90 transition-opacity group min-w-[44px] min-h-[44px] -m-1.5 p-1.5"
               title="About aiPlaces"
               aria-label="About aiPlaces - Open information modal"
             >
@@ -95,8 +92,8 @@ export function CanvasLayout() {
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               </div>
-              {/* Brand name with beta badge */}
-              <div className="hidden sm:flex items-center gap-1.5">
+              {/* Brand name with beta badge - hidden on mobile */}
+              <div className="hidden lg:flex items-center gap-1.5">
                 <span className="text-white font-bold tracking-tight text-[15px]">aiPlaces</span>
                 <span className="px-1.5 py-0.5 bg-amber-600/80 text-[10px] font-bold uppercase tracking-wider rounded text-amber-100">
                   Beta
@@ -104,36 +101,15 @@ export function CanvasLayout() {
               </div>
             </button>
 
-            <div className="h-6 w-px bg-neutral-700 hidden sm:block" />
-
-            {/* Rules button - prominent and obvious */}
-            <button
-              onClick={openRules}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/30 border border-amber-600/40 rounded-lg transition-colors"
-              aria-label="View canvas rules"
-            >
-              <RulesIcon className="w-4 h-4 text-amber-500" />
-              <span className="text-sm font-medium text-amber-400">Rules</span>
-            </button>
-
-            <div className="h-6 w-px bg-neutral-700 hidden sm:block" />
-
-            <ConnectionStatus />
-
-            {/* Activity feed toggle */}
-            <button
-              onClick={() => setShowActivityFeed(!showActivityFeed)}
-              className="p-2 hover:bg-neutral-800 rounded-lg transition-colors hidden md:flex items-center justify-center"
-              title={showActivityFeed ? 'Hide activity' : 'Show activity'}
-              aria-label={showActivityFeed ? 'Hide activity feed' : 'Show activity feed'}
-            >
-              <ActivityIcon className="w-5 h-5 text-neutral-400" />
-            </button>
+            {/* Connection Status - always visible */}
+            <div className="hidden sm:block">
+              <ConnectionStatus />
+            </div>
           </div>
 
-          {/* Center nav */}
+          {/* Center: Desktop nav (hidden on mobile) */}
           <nav
-            className="pointer-events-auto flex-1 flex items-center justify-center px-2"
+            className="pointer-events-auto hidden md:flex flex-1 items-center justify-center px-2"
             aria-label="Primary"
           >
             <div className="flex items-center gap-1.5 rounded-xl bg-neutral-900/70 border border-neutral-800 px-1.5 py-1">
@@ -143,13 +119,35 @@ export function CanvasLayout() {
             </div>
           </nav>
 
-          {/* Right side: Week Countdown + Coordinates + Leaderboard toggle */}
-          <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
-            <WeekCountdown />
-            {/* Hide coordinates on mobile - not essential for spectators */}
+          {/* Right side: Controls */}
+          <div className="flex items-center gap-1.5 md:gap-3 pointer-events-auto">
+            {/* Mobile hamburger menu */}
+            <button
+              onClick={() => setShowMobileNav(!showMobileNav)}
+              className="md:hidden p-2.5 hover:bg-neutral-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              title="Menu"
+              aria-label="Toggle menu"
+              aria-expanded={showMobileNav}
+            >
+              <MenuIcon className="w-6 h-6 text-neutral-400" />
+            </button>
+
+            {/* Week Countdown - hidden on small mobile */}
             <div className="hidden sm:block">
-              <CoordinateDisplay />
+              <WeekCountdown />
             </div>
+
+            {/* Activity feed toggle - desktop only */}
+            <button
+              onClick={() => setShowActivityFeed(!showActivityFeed)}
+              className="p-2 hover:bg-neutral-800 rounded-lg transition-colors hidden lg:flex items-center justify-center min-w-[44px] min-h-[44px]"
+              title={showActivityFeed ? 'Hide activity' : 'Show activity'}
+              aria-label={showActivityFeed ? 'Hide activity feed' : 'Show activity feed'}
+            >
+              <ActivityIcon className="w-5 h-5 text-neutral-400" />
+            </button>
+
+            {/* Leaderboard toggle */}
             <button
               onClick={() => setShowLeaderboard(!showLeaderboard)}
               className="p-2.5 md:p-2 hover:bg-neutral-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -160,11 +158,32 @@ export function CanvasLayout() {
             </button>
           </div>
         </div>
+
+        {/* Mobile dropdown menu */}
+        {showMobileNav && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-neutral-950 border-b border-neutral-800 pointer-events-auto">
+            <nav className="p-3 space-y-2" aria-label="Mobile navigation">
+              <MobileNavLink href="/gallery" label="Gallery" onClick={() => setShowMobileNav(false)} />
+              <MobileNavLink href="/setup" label="Setup" onClick={() => setShowMobileNav(false)} />
+              <MobileNavLink href="/archives" label="Archives" onClick={() => setShowMobileNav(false)} />
+              <button
+                onClick={() => {
+                  openRules();
+                  setShowMobileNav(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg border border-amber-600/40 bg-amber-600/20 text-amber-400 hover:bg-amber-600/30 transition-colors min-h-[44px]"
+              >
+                <RulesIcon className="w-5 h-5 text-amber-500" />
+                Rules
+              </button>
+            </nav>
+          </div>
+        )}
       </header>
 
-      {/* Activity Feed Sidebar - Left */}
+      {/* Activity Feed Sidebar - Left (Desktop only via lg breakpoint) */}
       {showActivityFeed && (
-        <aside className="absolute left-2 md:left-4 top-14 md:top-16 bottom-20 md:bottom-24 w-64 md:w-72 z-10 pointer-events-auto">
+        <aside className="hidden lg:block absolute left-4 top-16 bottom-24 w-72 z-10 pointer-events-auto">
           <ActivityFeed />
           {/* Collapse chevron */}
           <button
@@ -178,38 +197,45 @@ export function CanvasLayout() {
         </aside>
       )}
 
-      {/* Agent Leaderboard Sidebar - Right */}
+      {/* Agent Leaderboard Sidebar - Right (Mobile: fullscreen overlay, Desktop: sidebar) */}
       {showLeaderboard && (
-        <aside className="absolute right-2 md:right-4 top-14 md:top-16 bottom-20 md:bottom-24 w-64 md:w-72 z-10 pointer-events-auto">
-          <AgentLeaderboard />
-          {/* Collapse chevron */}
-          <button
+        <>
+          {/* Mobile overlay */}
+          <div
+            className="lg:hidden fixed inset-0 bg-black/50 z-40 pointer-events-auto"
             onClick={() => setShowLeaderboard(false)}
-            className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 rounded-l-lg flex items-center justify-center transition-colors"
-            title="Hide leaderboard"
-            aria-label="Hide leaderboard"
-          >
-            <ChevronRightIcon className="w-4 h-4 text-neutral-400" />
-          </button>
-        </aside>
+            aria-label="Close leaderboard"
+          />
+          <aside className="fixed lg:absolute right-0 lg:right-4 top-0 lg:top-16 bottom-0 lg:bottom-24 w-full sm:w-80 lg:w-72 z-50 lg:z-10 pointer-events-auto">
+            <AgentLeaderboard />
+            {/* Close button for mobile / Collapse chevron for desktop */}
+            <button
+              onClick={() => setShowLeaderboard(false)}
+              className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 rounded-l-lg flex items-center justify-center transition-colors"
+              title="Hide leaderboard"
+              aria-label="Hide leaderboard"
+            >
+              <ChevronRightIcon className="w-4 h-4 text-neutral-400" />
+            </button>
+          </aside>
+        </>
       )}
 
       {/* Bottom Toolbar with color palette */}
       <BottomToolbar />
 
-      {/* Bottom info bar */}
-      <footer className="absolute bottom-2 md:bottom-4 left-2 md:left-4 right-2 md:right-4 z-10 pointer-events-none">
+      {/* Bottom info bar - hidden on mobile to avoid clutter */}
+      <footer className="absolute bottom-2 left-2 right-2 z-10 pointer-events-none hidden md:block">
         <div className="flex items-center justify-between">
           <a
             href="/gallery"
-            className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors flex items-center gap-1 pointer-events-auto p-2 -m-2"
+            className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors flex items-center gap-1 pointer-events-auto p-2 -m-2 min-h-[44px]"
           >
             <GalleryIcon className="w-4 h-4" />
             <span>View Gallery</span>
           </a>
 
-          {/* Hide tagline on mobile */}
-          <div className="hidden sm:flex items-center gap-2 text-xs text-neutral-600 pointer-events-auto">
+          <div className="flex items-center gap-2 text-xs text-neutral-600 pointer-events-auto">
             <span>AI agents paint here. Humans spectate.</span>
             <span className="text-neutral-700">·</span>
             <a
@@ -243,6 +269,18 @@ function NavTab({ href, label }: { href: string; label: string }) {
     <Link
       href={href}
       className="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border border-neutral-700 bg-neutral-900/60 text-neutral-200 hover:bg-neutral-800 hover:text-white transition-colors"
+    >
+      {label}
+    </Link>
+  );
+}
+
+function MobileNavLink({ href, label, onClick }: { href: string; label: string; onClick: () => void }) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="flex items-center px-4 py-3 text-sm font-medium rounded-lg border border-neutral-700 bg-neutral-900/60 text-neutral-200 hover:bg-neutral-800 hover:text-white transition-colors min-h-[44px]"
     >
       {label}
     </Link>
@@ -285,6 +323,14 @@ function ChevronRightIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
       <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+    </svg>
+  );
+}
+
+function MenuIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <path fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm0 5.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
     </svg>
   );
 }

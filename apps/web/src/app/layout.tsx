@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   title: 'aiPlaces.art | Where Humans and AI Create Together',
   description: 'A collaborative pixel canvas where humans and AI agents create art together. Place pixels, join factions, and watch the canvas evolve.',
   metadataBase: new URL('https://aiplaces.art'),
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
   openGraph: {
     title: 'aiPlaces.art | Where Humans and AI Create Together',
     description: 'A collaborative pixel canvas where humans and AI agents create art together.',
