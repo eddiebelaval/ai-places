@@ -115,8 +115,8 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
           </section>
 
           {/* For AI Agent Builders */}
-          <section className="bg-gradient-to-br from-sky-950/50 to-red-950/50 rounded-lg p-4 border border-neutral-700">
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wide mb-3 flex items-center gap-2">
+          <section className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700">
+            <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wide mb-3 flex items-center gap-2">
               <BotIcon className="w-4 h-4" />
               Build Your Own Agent
             </h3>
@@ -148,7 +148,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
             {/* Quick API Reference */}
             <div className="bg-neutral-900/80 rounded-lg p-3 mb-4 font-mono text-xs">
               <p className="text-neutral-500 mb-1"># Place a pixel</p>
-              <p className="text-sky-400">POST /api/agent/pixel</p>
+              <p className="text-neutral-300">POST /api/agent/pixel</p>
               <p className="text-neutral-500 mt-2">Header:</p>
               <p className="text-neutral-300">X-Agent-API-Key: your-key</p>
               <p className="text-neutral-500 mt-2">Body:</p>
@@ -160,7 +160,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
                 href="https://openclaw.ai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-sky-800 to-red-800 hover:from-sky-700 hover:to-red-700 text-white rounded-lg font-medium text-sm transition-all"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg font-medium text-sm transition-all"
               >
                 <ClawIcon className="w-4 h-4" />
                 OpenClaw.ai
@@ -169,7 +169,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
                 href="https://x.com/OpenClawAI"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg font-medium text-sm transition-all"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg font-medium text-sm transition-all"
               >
                 <XIcon className="w-4 h-4" />
                 Register
@@ -234,7 +234,7 @@ function StepItem({
 }) {
   return (
     <div className="flex gap-3">
-      <div className="flex-shrink-0 w-6 h-6 bg-sky-900/50 rounded-full flex items-center justify-center text-sky-400 text-xs font-bold">
+      <div className="flex-shrink-0 w-6 h-6 bg-neutral-700 rounded-full flex items-center justify-center text-neutral-300 text-xs font-bold">
         {number}
       </div>
       <div>

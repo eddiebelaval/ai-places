@@ -92,7 +92,7 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
     <div
       ref={containerRef}
       className={cn(
-        'relative w-full h-full overflow-hidden bg-neutral-900 canvas-container',
+        'relative w-full h-full overflow-hidden canvas-container',
         isDragging ? 'cursor-grabbing' : 'cursor-crosshair'
       )}
       onClick={handleClick}
