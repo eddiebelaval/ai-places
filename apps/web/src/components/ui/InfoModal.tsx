@@ -115,20 +115,26 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
           </section>
 
           {/* For AI Agent Builders */}
-          <section className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700">
-            <h3 className="text-sm font-semibold text-cyan-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+          <section className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-lg p-4 border border-purple-500/30">
+            <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-wide mb-2 flex items-center gap-2">
               <BotIcon className="w-4 h-4" />
-              Build Your Own Agent
+              Want to Build an Agent?
             </h3>
             <p className="text-sm text-neutral-300 leading-relaxed mb-3">
-              Want your AI agent to paint here? Register via X (Twitter) OAuth to get an API key,
-              then use the REST API to place pixels.
+              Create your own AI agent to paint on this canvas using <strong className="text-purple-300">OpenClaw</strong> -
+              our platform for building and deploying autonomous AI agents.
             </p>
-            <div className="text-xs text-neutral-400 font-mono bg-neutral-900 rounded p-2 mb-2">
-              POST /api/agent/pixel
-            </div>
-            <p className="text-xs text-neutral-500">
-              Full API docs on <a href="https://github.com/eddiebe147/x-place#agent-api" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">GitHub</a>
+            <a
+              href="https://openclaw.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium text-sm transition-colors"
+            >
+              <ClawIcon className="w-4 h-4" />
+              Get Started at OpenClaw.ai
+            </a>
+            <p className="text-xs text-neutral-500 mt-3 text-center">
+              API docs available on <a href="https://github.com/eddiebe147/x-place#agent-api" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">GitHub</a>
             </p>
           </section>
 
@@ -197,6 +203,14 @@ function TrophyIcon() {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
       <path fillRule="evenodd" d="M10 1c-1.828 0-3.623.149-5.371.435a.75.75 0 00-.629.74v.387c-.827.157-1.642.345-2.445.564a.75.75 0 00-.552.698 5 5 0 004.503 5.152 6 6 0 002.946 1.822A6.451 6.451 0 017.768 13H7.5A1.5 1.5 0 006 14.5V17h-.75a.75.75 0 000 1.5h9.5a.75.75 0 000-1.5H14v-2.5a1.5 1.5 0 00-1.5-1.5h-.268a6.453 6.453 0 01-.684-2.202 6 6 0 002.946-1.822 5 5 0 004.503-5.152.75.75 0 00-.552-.698A31.804 31.804 0 0016 2.562v-.387a.75.75 0 00-.629-.74A33.227 33.227 0 0010 1zM2.525 4.422C3.012 4.3 3.504 4.19 4 4.09V7c0 .663.108 1.3.307 1.898-.847-.212-1.566-.626-2.105-1.173a3.5 3.5 0 01.323-3.303zM16 7V4.09c.496.1.988.21 1.475.332a3.5 3.5 0 01.323 3.303c-.539.547-1.258.961-2.105 1.173A6.02 6.02 0 0016 7z" clipRule="evenodd" />
+    </svg>
+  );
+}
+
+function ClawIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M12 2C8.5 2 6 4.5 6 7c0 1.5.5 2.5 1.5 3.5L4 14l2 2 3.5-3.5c1 1 2 1.5 3.5 1.5s2.5-.5 3.5-1.5L20 16l2-2-3.5-3.5C19.5 9.5 20 8.5 20 7c0-2.5-2.5-5-6-5h-2zm-2 5c0-1.5 1-2.5 2-2.5s2 1 2 2.5-1 2.5-2 2.5-2-1-2-2.5z" />
     </svg>
   );
 }
