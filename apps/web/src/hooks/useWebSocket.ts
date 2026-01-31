@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useUIStore } from '@/stores/ui-store';
 import { useCanvasStore } from '@/stores/canvas-store';
 import { useAuthStore } from '@/stores/auth-store';
+import { useWeekStore } from '@/stores/week-store';
 import type {
   ClientMessage,
   ServerMessage,
@@ -34,6 +35,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const { setConnected, setCooldown } = useUIStore();
   const { initializeCanvas, updatePixel } = useCanvasStore();
   const { sessionToken } = useAuthStore();
+  const { setConfig, setResetting, setLastReset } = useWeekStore();
 
   // Handle incoming messages
   const handleMessage = useCallback(
@@ -90,6 +92,28 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             // TODO: Update leaderboard store
             break;
 
+          case 'week_config':
+            console.log('[WS] Week config received:', message.payload.weekNumber);
+            setConfig(message.payload);
+            break;
+
+          case 'week_reset':
+            console.log('[WS] Week reset!', message.payload.archiveId);
+            // Clear canvas and update week config
+            setResetting(true);
+            // Small delay to show "resetting" state
+            setTimeout(() => {
+              initializeCanvas(''); // Clear canvas with empty data
+              setConfig(message.payload.newConfig);
+              setLastReset(message.payload.archiveId, message.payload.stats);
+            }, 500);
+            break;
+
+          case 'week_warning':
+            console.log('[WS] Week warning:', message.payload.minutesRemaining, 'minutes remaining');
+            // Could show a toast notification here
+            break;
+
           default:
             console.log('[WS] Unknown message type:', (message as any).type);
         }
@@ -97,7 +121,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         console.error('[WS] Failed to parse message:', err);
       }
     },
-    [initializeCanvas, updatePixel, setCooldown]
+    [initializeCanvas, updatePixel, setCooldown, setConfig, setResetting, setLastReset]
   );
 
   // Connect to WebSocket (singleton pattern)

@@ -4,6 +4,7 @@
 
 import type { ColorIndex, PixelPlacement } from './canvas.js';
 import type { UserSession, LeaderboardEntry } from './user.js';
+import type { WeekConfig, WeekStats } from './week.js';
 
 // ============================================
 // CLIENT -> SERVER MESSAGES
@@ -136,6 +137,37 @@ export interface ConnectionCountMessage {
   };
 }
 
+// ============================================
+// V2: WEEK SYSTEM MESSAGES
+// ============================================
+
+export interface WeekConfigMessage {
+  type: 'week_config';
+  payload: WeekConfig;
+}
+
+export interface WeekResetMessage {
+  type: 'week_reset';
+  payload: {
+    /** Archive ID of the just-completed week */
+    archiveId: string;
+    /** Stats from the completed week */
+    stats: WeekStats;
+    /** New week configuration */
+    newConfig: WeekConfig;
+  };
+}
+
+export interface WeekWarningMessage {
+  type: 'week_warning';
+  payload: {
+    /** Minutes until reset */
+    minutesRemaining: number;
+    /** Human-readable message */
+    message: string;
+  };
+}
+
 export type ServerMessage =
   | AuthenticatedMessage
   | AuthErrorMessage
@@ -145,4 +177,7 @@ export type ServerMessage =
   | CooldownUpdateMessage
   | LeaderboardUpdateMessage
   | PongMessage
-  | ConnectionCountMessage;
+  | ConnectionCountMessage
+  | WeekConfigMessage
+  | WeekResetMessage
+  | WeekWarningMessage;

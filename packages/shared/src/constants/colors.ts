@@ -72,3 +72,22 @@ export const COLOR_RGBA_LOOKUP = new Uint32Array(
     return (a << 24) | (b << 16) | (g << 8) | r;
   })
 );
+
+/**
+ * RGBA color object for PNG generation
+ */
+export interface RGBAColor {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
+/**
+ * Pre-computed RGBA objects as array for PNG export
+ * Index by number (0-15) for runtime flexibility
+ */
+export const COLOR_PALETTE_RGBA: RGBAColor[] = PALETTE_ARRAY.map((hex) => {
+  const [r, g, b, a] = hexToRGBA(hex);
+  return { r, g, b, a };
+});

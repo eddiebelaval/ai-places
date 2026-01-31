@@ -5,6 +5,7 @@ import { PixelCanvas } from '@/components/canvas/PixelCanvas';
 import { CoordinateDisplay } from '@/components/canvas/CoordinateDisplay';
 import { ConnectionStatus } from '@/components/ui/ConnectionStatus';
 import { BottomToolbar } from '@/components/ui/BottomToolbar';
+import { WeekCountdown } from '@/components/ui/WeekCountdown';
 import { LoginButton } from '@/components/auth/LoginButton';
 import { SpectatorBadge } from '@/components/auth/SpectatorBadge';
 
@@ -46,8 +47,11 @@ export function CanvasLayout() {
           <SpectatorBadge />
         </nav>
 
-        {/* Right side: Coordinates */}
-        <CoordinateDisplay />
+        {/* Right side: Week Countdown + Coordinates */}
+        <div className="flex items-center gap-3 pointer-events-auto">
+          <WeekCountdown />
+          <CoordinateDisplay />
+        </div>
       </header>
 
       {/* Bottom toolbar - r/place style */}

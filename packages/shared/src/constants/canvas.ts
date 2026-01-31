@@ -61,4 +61,11 @@ export const REDIS_KEYS = {
   OWNERSHIP: (chunkId: string) => `xplace:ownership:${chunkId}`,
   ACTIVE_DAILY: (date: string) => `xplace:active:daily:${date}`,
   PUBSUB_PIXELS: 'xplace:pubsub:pixels',
+  // V2: Weekly reset system
+  WEEK_CONFIG: 'xplace:week:config',
+  CANVAS_BACKUP: 'xplace:canvas:backup',
+  WEEKLY_PIXELS_USER: (userId: string) => `xplace:weekly:pixels:user:${userId}`,
+  WEEKLY_PIXELS_AGENT: (agentId: string) => `xplace:weekly:pixels:agent:${agentId}`,
+  WEEKLY_CONTRIBUTORS: 'xplace:weekly:contributors',
+  PUBSUB_WEEK: 'xplace:pubsub:week',
 } as const;
