@@ -8,74 +8,49 @@ import { cn } from '@/lib/utils';
 
 interface ActivityItem {
   id: string;
-  type: 'pixel' | 'agent_pixel' | 'comment' | 'join';
+  type: 'pixel' | 'agent_pixel';
   timestamp: Date;
   data: {
-    x?: number;
-    y?: number;
-    color?: ColorIndex;
+    x: number;
+    y: number;
+    color: ColorIndex;
     agentName?: string;
-    userName?: string;
-    message?: string;
+    agentId?: string;
   };
 }
-
-// Generate a random agent/user name for demo
-const DEMO_AGENTS = [
-  'claude-3-opus',
-  'gpt-4-turbo',
-  'gemini-pro',
-  'mistral-large',
-  'llama-3-70b',
-];
-
-const DEMO_USERS = [
-  'pixel_master',
-  'art_lover_42',
-  'canvas_ninja',
-  'color_wizard',
-];
 
 export function ActivityFeed() {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { version } = useCanvasStore();
 
-  // Simulate activity for demo purposes
-  // In production, this would come from WebSocket events
+  // Listen for real pixel_placed events from WebSocket
   useEffect(() => {
-    // Add a new activity every few seconds for demo
-    const addDemoActivity = () => {
-      const isAgent = Math.random() > 0.3; // 70% agent, 30% human
-      const x = Math.floor(Math.random() * 500);
-      const y = Math.floor(Math.random() * 500);
-      const color = Math.floor(Math.random() * 16) as ColorIndex;
+    const handlePixelPlaced = (event: CustomEvent) => {
+      const { x, y, color, agentName, agentId } = event.detail;
 
       const newActivity: ActivityItem = {
-        id: `${Date.now()}-${Math.random()}`,
-        type: isAgent ? 'agent_pixel' : 'pixel',
+        id: `${Date.now()}-${x}-${y}`,
+        type: agentId ? 'agent_pixel' : 'pixel',
         timestamp: new Date(),
         data: {
           x,
           y,
           color,
-          agentName: isAgent ? DEMO_AGENTS[Math.floor(Math.random() * DEMO_AGENTS.length)] : undefined,
-          userName: !isAgent ? DEMO_USERS[Math.floor(Math.random() * DEMO_USERS.length)] : undefined,
+          agentName,
+          agentId,
         },
       };
 
-      setActivities((prev) => [newActivity, ...prev].slice(0, 50)); // Keep last 50
+      setActivities((prev) => [newActivity, ...prev].slice(0, 50));
     };
 
-    // Add initial activities
-    for (let i = 0; i < 10; i++) {
-      setTimeout(() => addDemoActivity(), i * 100);
-    }
+    // Listen for pixel_activity events (broadcast from WebSocket or canvas updates)
+    window.addEventListener('pixel_activity', handlePixelPlaced as EventListener);
 
-    // Add new activity periodically
-    const interval = setInterval(addDemoActivity, 3000 + Math.random() * 2000);
-
-    return () => clearInterval(interval);
+    return () => {
+      window.removeEventListener('pixel_activity', handlePixelPlaced as EventListener);
+    };
   }, []);
 
   // Auto-scroll to top when new activity arrives
@@ -114,6 +89,9 @@ export function ActivityFeed() {
         {activities.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-neutral-500 text-sm">Waiting for activity...</p>
+            <p className="text-neutral-600 text-xs mt-2">
+              Pixels placed by agents will appear here
+            </p>
           </div>
         ) : (
           activities.map((activity) => (
@@ -125,7 +103,7 @@ export function ActivityFeed() {
       {/* Footer */}
       <div className="p-3 border-t border-neutral-800 text-center">
         <p className="text-xs text-neutral-600">
-          {activities.length} recent events
+          {activities.length > 0 ? `${activities.length} recent events` : 'No recent activity'}
         </p>
       </div>
     </div>
@@ -140,7 +118,7 @@ function ActivityRow({
   formatTime: (date: Date) => string;
 }) {
   const isAgent = activity.type === 'agent_pixel';
-  const name = isAgent ? activity.data.agentName : activity.data.userName;
+  const name = activity.data.agentName || 'Unknown Agent';
   const color = activity.data.color;
 
   return (

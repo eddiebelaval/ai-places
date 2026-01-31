@@ -5,7 +5,7 @@ import type { ColorIndex } from '@aiplaces/shared';
 import { useState, useEffect } from 'react';
 import { InfoModal } from './InfoModal';
 
-// Simulated color activity data - in production this would come from WebSocket
+// Color activity tracked from real WebSocket events
 interface ColorActivity {
   color: ColorIndex;
   count: number;
@@ -16,34 +16,42 @@ export function BottomToolbar() {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [colorActivity, setColorActivity] = useState<ColorActivity[]>([]);
   const [recentColor, setRecentColor] = useState<ColorIndex | null>(null);
+  const [totalPixels, setTotalPixels] = useState(0);
 
-  // Initialize with some activity data
+  // Initialize empty activity tracking
   useEffect(() => {
     const initialActivity: ColorActivity[] = Object.keys(COLOR_PALETTE).map((index) => ({
       color: parseInt(index) as ColorIndex,
-      count: Math.floor(Math.random() * 100),
-      lastUsed: Date.now() - Math.floor(Math.random() * 60000),
+      count: 0,
+      lastUsed: 0,
     }));
     setColorActivity(initialActivity);
   }, []);
 
-  // Simulate live activity - flash colors when "used"
+  // Listen for real pixel_activity events
   useEffect(() => {
-    const interval = setInterval(() => {
-      const randomColor = Math.floor(Math.random() * 16) as ColorIndex;
-      setRecentColor(randomColor);
+    const handlePixelActivity = (event: CustomEvent) => {
+      const { color } = event.detail;
+      if (color === undefined) return;
+
+      setRecentColor(color);
       setColorActivity((prev) =>
         prev.map((item) =>
-          item.color === randomColor
+          item.color === color
             ? { ...item, count: item.count + 1, lastUsed: Date.now() }
             : item
         )
       );
+      setTotalPixels((prev) => prev + 1);
+
       // Clear the flash after 500ms
       setTimeout(() => setRecentColor(null), 500);
-    }, 2000 + Math.random() * 3000);
+    };
 
-    return () => clearInterval(interval);
+    window.addEventListener('pixel_activity', handlePixelActivity as EventListener);
+    return () => {
+      window.removeEventListener('pixel_activity', handlePixelActivity as EventListener);
+    };
   }, []);
 
   const colorEntries = Object.entries(COLOR_PALETTE) as [string, string][];
@@ -51,6 +59,7 @@ export function BottomToolbar() {
   // Sort by most used for the "hot" indicator
   const sortedByUsage = [...colorActivity].sort((a, b) => b.count - a.count);
   const topColors = sortedByUsage.slice(0, 3).map((a) => a.color);
+  const hasActivity = totalPixels > 0;
 
   return (
     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
@@ -61,43 +70,41 @@ export function BottomToolbar() {
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                Live Color Activity
+                Color Palette
               </span>
             </div>
-            <span className="text-[10px] text-neutral-500">
-              {colorActivity.reduce((sum, a) => sum + a.count, 0).toLocaleString()} pixels
-            </span>
+            {hasActivity && (
+              <span className="text-[10px] text-neutral-500">
+                {totalPixels.toLocaleString()} pixels this session
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Color Activity Grid - 2 rows of 8 */}
+        {/* Color Grid - 2 rows of 8 */}
         <div className="px-4 py-3">
-          <div className="grid grid-cols-8 gap-1.5" role="list" aria-label="Color activity tracker">
+          <div className="grid grid-cols-8 gap-1.5" role="list" aria-label="Available colors">
             {colorEntries.map(([index, hex]) => {
               const colorIndex = parseInt(index) as ColorIndex;
               const activity = colorActivity.find((a) => a.color === colorIndex);
               const isRecent = recentColor === colorIndex;
-              const isHot = topColors.includes(colorIndex);
-              const activityLevel = activity ? Math.min(activity.count / 50, 1) : 0;
+              const isHot = hasActivity && topColors.includes(colorIndex) && (activity?.count || 0) > 0;
 
               return (
                 <div
                   key={index}
                   className="relative group"
                   role="listitem"
-                  aria-label={`${COLOR_NAMES[colorIndex]}: ${activity?.count || 0} pixels`}
+                  aria-label={`${COLOR_NAMES[colorIndex]}${activity?.count ? `: ${activity.count} pixels` : ''}`}
                 >
-                  {/* Color square with activity indicator */}
+                  {/* Color square */}
                   <div
                     className={`
                       w-8 h-8 rounded-lg transition-all duration-300
                       ${isRecent ? 'scale-125 ring-2 ring-white shadow-lg z-10' : ''}
                       ${isHot && !isRecent ? 'ring-1 ring-amber-500/50' : ''}
                     `}
-                    style={{
-                      backgroundColor: hex,
-                      opacity: 0.3 + activityLevel * 0.7,
-                    }}
+                    style={{ backgroundColor: hex }}
                   />
 
                   {/* Activity pulse for recent */}
@@ -108,8 +115,8 @@ export function BottomToolbar() {
                     />
                   )}
 
-                  {/* Hot indicator */}
-                  {isHot && topColors.indexOf(colorIndex) === 0 && (
+                  {/* Hot indicator - only if actually has activity */}
+                  {isHot && topColors.indexOf(colorIndex) === 0 && (activity?.count || 0) > 0 && (
                     <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-500 flex items-center justify-center">
                       <span className="text-[8px] font-bold text-black">1</span>
                     </div>
@@ -118,7 +125,9 @@ export function BottomToolbar() {
                   {/* Tooltip on hover */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-800 rounded text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
                     <div className="font-medium">{COLOR_NAMES[colorIndex]}</div>
-                    <div className="text-neutral-400">{activity?.count || 0} placed</div>
+                    {hasActivity && activity?.count ? (
+                      <div className="text-neutral-400">{activity.count} placed</div>
+                    ) : null}
                   </div>
                 </div>
               );
@@ -131,20 +140,26 @@ export function BottomToolbar() {
 
         {/* Bottom row: Status + Info */}
         <div className="px-4 py-3 flex items-center justify-between gap-4">
-          {/* Trending color */}
+          {/* Trending color or placeholder */}
           <div className="flex items-center gap-2">
-            <TrendingIcon className="w-4 h-4 text-amber-500" />
-            <span className="text-xs text-neutral-500">Trending:</span>
-            {sortedByUsage[0] && (
-              <div className="flex items-center gap-1.5">
-                <div
-                  className="w-4 h-4 rounded"
-                  style={{ backgroundColor: COLOR_PALETTE[sortedByUsage[0].color] }}
-                />
-                <span className="text-sm text-neutral-300">
-                  {COLOR_NAMES[sortedByUsage[0].color]}
-                </span>
-              </div>
+            {hasActivity && sortedByUsage[0]?.count > 0 ? (
+              <>
+                <TrendingIcon className="w-4 h-4 text-amber-500" />
+                <span className="text-xs text-neutral-500">Trending:</span>
+                <div className="flex items-center gap-1.5">
+                  <div
+                    className="w-4 h-4 rounded"
+                    style={{ backgroundColor: COLOR_PALETTE[sortedByUsage[0].color] }}
+                  />
+                  <span className="text-sm text-neutral-300">
+                    {COLOR_NAMES[sortedByUsage[0].color]}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <span className="text-xs text-neutral-500">
+                Watch agents paint the canvas
+              </span>
             )}
           </div>
 

@@ -89,30 +89,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Transform agents with placeholder reputation scores
+    // Transform agents with actual data (no mock values)
     const transformedAgents = (agents || []).map((agent) => {
-      // Placeholder reputation scores until we have real data
-      const scores = {
-        collaboration: Math.floor(Math.random() * 40) + 60,
-        territory: Math.floor(Math.random() * 40) + 60,
-        creativity: Math.floor(Math.random() * 40) + 60,
-        consistency: Math.floor(Math.random() * 40) + 60,
-      };
-      const overall = Math.round(
-        (scores.collaboration + scores.territory + scores.creativity + scores.consistency) / 4
-      );
-
       return {
         id: agent.id,
         name: agent.name,
         displayName: agent.x_username || agent.name,
-        avatarUrl: null, // No avatar_url column in schema yet
+        avatarUrl: null,
         totalPixels: agent.total_pixels || 0,
-        weeksParticipated: 0, // No weeks_participated column in schema yet
-        reputation: {
-          ...scores,
-          overall,
-        },
+        weeksParticipated: 0, // Will be tracked when weekly reset is implemented
         createdAt: agent.created_at,
       };
     });
