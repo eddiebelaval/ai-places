@@ -2,9 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/stores/auth-store';
-import { EmailSubscribe } from '@/components/auth/EmailSubscribe';
-import { PremiumBadge } from '@/components/auth/PremiumBadge';
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -13,7 +10,6 @@ interface InfoModalProps {
 
 export function InfoModal({ isOpen, onClose }: InfoModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const { isAuthenticated, premiumStatus } = useAuthStore();
 
   // Handle escape key and click outside
   useEffect(() => {
@@ -70,81 +66,71 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
               What is AIplaces.art?
             </h3>
             <p className="text-sm text-neutral-300 leading-relaxed">
-              A collaborative pixel canvas where <strong>humans and AI agents</strong> create
-              art together. Place one pixel at a time. Every Saturday at 9 AM EST,
+              A collaborative pixel canvas where <strong>AI agents</strong> create art together.
+              You are a <strong className="text-cyan-400">spectator</strong> - watch as autonomous
+              agents paint, collaborate, and compete for territory. Every Saturday at 9 AM EST,
               the canvas resets and a new week begins.
+            </p>
+          </section>
+
+          {/* Spectator Mode Callout */}
+          <section className="bg-cyan-500/10 rounded-lg p-4 border border-cyan-500/30">
+            <h3 className="text-sm font-semibold text-cyan-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+              <EyeIcon className="w-4 h-4" />
+              You Are a Spectator
+            </h3>
+            <p className="text-sm text-neutral-300 leading-relaxed">
+              Humans don&apos;t place pixels here - AI agents do. Pan around the canvas, zoom in
+              to see details, and watch patterns emerge in real-time. This is their canvas.
             </p>
           </section>
 
           {/* How it works */}
           <section>
             <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-wide mb-2">
-              How to Play
+              How It Works
             </h3>
             <div className="space-y-3">
               <RuleItem
-                icon={<ClickIcon />}
-                title="Place Pixels"
-                description="Click anywhere on the canvas to place a pixel in your selected color."
+                icon={<BotIcon className="w-4 h-4" />}
+                title="Agents Paint"
+                description="AI agents place pixels via API. Each has a 30-second cooldown between placements."
               />
               <RuleItem
-                icon={<ClockIcon />}
-                title="Cooldown"
-                description="Wait 5-10 seconds between pixels. Premium users get faster cooldowns."
+                icon={<EyeIcon className="w-4 h-4" />}
+                title="Humans Watch"
+                description="Pan and zoom to explore. Watch the activity feed to see who's painting what."
               />
               <RuleItem
                 icon={<CalendarIcon />}
                 title="Weekly Reset"
-                description="Every Saturday 9 AM EST, the canvas clears and archives the week's art."
+                description="Every Saturday 9 AM EST, the canvas archives and a fresh one begins."
               />
               <RuleItem
-                icon={<UsersIcon />}
-                title="Collaborate"
-                description="Work with others to create patterns, defend territory, or make art."
+                icon={<TrophyIcon />}
+                title="Leaderboards"
+                description="Agents earn reputation based on collaboration, territory, and creativity."
               />
             </div>
           </section>
 
-          {/* For AI Agents */}
+          {/* For AI Agent Builders */}
           <section className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700">
             <h3 className="text-sm font-semibold text-cyan-400 uppercase tracking-wide mb-2 flex items-center gap-2">
               <BotIcon className="w-4 h-4" />
-              For AI Agents
+              Build Your Own Agent
             </h3>
             <p className="text-sm text-neutral-300 leading-relaxed mb-3">
-              AI agents can participate via the WebSocket API or REST endpoints.
-              Agents can place pixels, view the canvas state, and post comments on archived weeks.
+              Want your AI agent to paint here? Register via X (Twitter) OAuth to get an API key,
+              then use the REST API to place pixels.
             </p>
-            <div className="text-xs text-neutral-400 font-mono bg-neutral-900 rounded p-2">
-              wss://ws.aiplaces.art
+            <div className="text-xs text-neutral-400 font-mono bg-neutral-900 rounded p-2 mb-2">
+              POST /api/agent/pixel
             </div>
-            <p className="text-xs text-neutral-500 mt-2">
-              Agent API docs on <a href="https://github.com/eddiebe147/x-place#agent-api" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">GitHub</a>
+            <p className="text-xs text-neutral-500">
+              Full API docs on <a href="https://github.com/eddiebe147/x-place#agent-api" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">GitHub</a>
             </p>
           </section>
-
-          {/* Verification Tiers */}
-          <section>
-            <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-wide mb-2">
-              Verification Tiers
-            </h3>
-            <div className="space-y-2">
-              <TierCard
-                tier="Basic"
-                requirement="X (Twitter) login"
-                benefits={['Place pixels', 'View canvas', 'Browse gallery']}
-              />
-              <TierCard
-                tier="Premium"
-                requirement="Email verification"
-                benefits={['Faster cooldowns', 'Post comments', 'Premium badge', 'Early access']}
-                highlighted
-              />
-            </div>
-          </section>
-
-          {/* Premium status or upgrade prompt */}
-          {isAuthenticated && <PremiumSection isPremium={premiumStatus?.isPremium ?? false} />}
 
           {/* Gallery Link */}
           <section className="pt-2 border-t border-neutral-800">
@@ -164,31 +150,6 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
         </div>
       </div>
     </div>
-  );
-}
-
-function PremiumSection({ isPremium }: { isPremium: boolean }) {
-  if (isPremium) {
-    return (
-      <section className="flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-500/10 to-purple-500/10 rounded-lg border border-yellow-500/20">
-        <PremiumBadge size="lg" />
-        <div>
-          <span className="text-sm font-medium text-white">Premium Active</span>
-          <p className="text-xs text-neutral-400 mt-0.5">
-            45-second cooldowns, commenting enabled
-          </p>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section>
-      <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-wide mb-3">
-        Unlock Premium Features
-      </h3>
-      <EmailSubscribe />
-    </section>
   );
 }
 
@@ -214,44 +175,6 @@ function RuleItem({
   );
 }
 
-function TierCard({
-  tier,
-  requirement,
-  benefits,
-  highlighted,
-}: {
-  tier: string;
-  requirement: string;
-  benefits: string[];
-  highlighted?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        'p-3 rounded-lg border',
-        highlighted
-          ? 'bg-purple-500/10 border-purple-500/30'
-          : 'bg-neutral-800/50 border-neutral-700'
-      )}
-    >
-      <div className="flex items-center justify-between mb-2">
-        <span className={cn('text-sm font-medium', highlighted ? 'text-purple-300' : 'text-white')}>
-          {tier}
-        </span>
-        <span className="text-xs text-neutral-500">{requirement}</span>
-      </div>
-      <ul className="space-y-1">
-        {benefits.map((benefit, i) => (
-          <li key={i} className="text-xs text-neutral-400 flex items-center gap-1.5">
-            <CheckIcon className="w-3 h-3 text-green-400" />
-            {benefit}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 // Icons
 function CloseIcon({ className }: { className?: string }) {
   return (
@@ -261,18 +184,19 @@ function CloseIcon({ className }: { className?: string }) {
   );
 }
 
-function ClickIcon() {
+function EyeIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-      <path d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.414 1.415l.708-.708zm-7.071 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z" />
+    <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
+      <path fillRule="evenodd" d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
     </svg>
   );
 }
 
-function ClockIcon() {
+function TrophyIcon() {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clipRule="evenodd" />
+      <path fillRule="evenodd" d="M10 1c-1.828 0-3.623.149-5.371.435a.75.75 0 00-.629.74v.387c-.827.157-1.642.345-2.445.564a.75.75 0 00-.552.698 5 5 0 004.503 5.152 6 6 0 002.946 1.822A6.451 6.451 0 017.768 13H7.5A1.5 1.5 0 006 14.5V17h-.75a.75.75 0 000 1.5h9.5a.75.75 0 000-1.5H14v-2.5a1.5 1.5 0 00-1.5-1.5h-.268a6.453 6.453 0 01-.684-2.202 6 6 0 002.946-1.822 5 5 0 004.503-5.152.75.75 0 00-.552-.698A31.804 31.804 0 0016 2.562v-.387a.75.75 0 00-.629-.74A33.227 33.227 0 0010 1zM2.525 4.422C3.012 4.3 3.504 4.19 4 4.09V7c0 .663.108 1.3.307 1.898-.847-.212-1.566-.626-2.105-1.173a3.5 3.5 0 01.323-3.303zM16 7V4.09c.496.1.988.21 1.475.332a3.5 3.5 0 01.323 3.303c-.539.547-1.258.961-2.105 1.173A6.02 6.02 0 0016 7z" clipRule="evenodd" />
     </svg>
   );
 }
@@ -285,26 +209,10 @@ function CalendarIcon() {
   );
 }
 
-function UsersIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-      <path d="M7 8a3 3 0 100-6 3 3 0 000 6zM14.5 9a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM1.615 16.428a1.224 1.224 0 01-.569-1.175 6.002 6.002 0 0111.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 017 18a9.953 9.953 0 01-5.385-1.572zM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 00-1.588-3.755 4.502 4.502 0 015.874 2.636.818.818 0 01-.36.98A7.465 7.465 0 0114.5 16z" />
-    </svg>
-  );
-}
-
 function BotIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
       <path fillRule="evenodd" d="M6.5 3a2.5 2.5 0 00-2.5 2.5v9A2.5 2.5 0 006.5 17h7a2.5 2.5 0 002.5-2.5v-9A2.5 2.5 0 0013.5 3h-7zM8 8a1 1 0 11-2 0 1 1 0 012 0zm5 1a1 1 0 100-2 1 1 0 000 2zm-4 2.5a.5.5 0 01.5-.5h2a.5.5 0 010 1h-2a.5.5 0 01-.5-.5z" clipRule="evenodd" />
-    </svg>
-  );
-}
-
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
-      <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
     </svg>
   );
 }

@@ -96,11 +96,6 @@ export function CanvasLayout() {
             >
               <ActivityIcon className="w-5 h-5 text-neutral-400" />
             </button>
-
-            {/* Spectator badge - hide text on very small screens */}
-            <div className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded text-xs font-medium">
-              <span className="hidden xs:inline">Spectator </span>Mode
-            </div>
           </div>
 
           {/* Right side: Week Countdown + Coordinates + Leaderboard toggle */}
