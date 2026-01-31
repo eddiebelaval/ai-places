@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { PixelCanvas } from '@/components/canvas/PixelCanvas';
-import { CoordinateDisplay } from '@/components/canvas/CoordinateDisplay';
 import { ConnectionStatus } from '@/components/ui/ConnectionStatus';
 import { WeekCountdown } from '@/components/ui/WeekCountdown';
 import { InfoModal } from '@/components/ui/InfoModal';
@@ -15,8 +13,9 @@ import { ActivityFeed } from '@/components/ui/ActivityFeed';
 import { SetupModule } from '@/components/setup/SetupModule';
 import { GalleryContent } from '@/components/gallery/GalleryContent';
 import { debug } from '@/lib/debug';
+import { EdgeTab } from '@/components/ui/EdgeTab';
 
-type OverlayType = 'gallery' | 'setup' | 'archives' | null;
+type OverlayType = 'gallery' | 'setup' | null;
 
 const STORAGE_KEY = 'aiplaces_intro_seen';
 
@@ -73,6 +72,20 @@ export function CanvasLayout() {
         <PixelCanvas />
       </main>
 
+      {/* Edge Tabs - Desktop only */}
+      <EdgeTab
+        label="Activity"
+        side="left"
+        isActive={showActivityFeed}
+        onClick={() => setShowActivityFeed(!showActivityFeed)}
+      />
+      <EdgeTab
+        label="Agents"
+        side="right"
+        isActive={showLeaderboard}
+        onClick={() => setShowLeaderboard(!showLeaderboard)}
+      />
+
       {/* Top bar */}
       <header
         className="absolute top-0 left-0 right-0 z-10 pointer-events-none"
@@ -122,7 +135,6 @@ export function CanvasLayout() {
             <div className="flex items-center gap-1.5 rounded-xl bg-neutral-900/70 border border-neutral-800 px-1.5 py-1">
               <NavTab label="Gallery" onClick={() => setActiveOverlay('gallery')} />
               <NavTab label="Setup" onClick={() => setActiveOverlay('setup')} />
-              <NavTab label="Archives" onClick={() => setActiveOverlay('archives')} />
             </div>
           </nav>
 
@@ -143,26 +155,6 @@ export function CanvasLayout() {
             <div className="hidden sm:block">
               <WeekCountdown />
             </div>
-
-            {/* Activity feed toggle - desktop only */}
-            <button
-              onClick={() => setShowActivityFeed(!showActivityFeed)}
-              className="p-2 hover:bg-neutral-800 rounded-lg transition-colors hidden lg:flex items-center justify-center min-w-[44px] min-h-[44px]"
-              title={showActivityFeed ? 'Hide activity' : 'Show activity'}
-              aria-label={showActivityFeed ? 'Hide activity feed' : 'Show activity feed'}
-            >
-              <ActivityIcon className="w-5 h-5 text-neutral-400" />
-            </button>
-
-            {/* Leaderboard toggle */}
-            <button
-              onClick={() => setShowLeaderboard(!showLeaderboard)}
-              className="p-2.5 md:p-2 hover:bg-neutral-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-              title={showLeaderboard ? 'Hide leaderboard' : 'Show leaderboard'}
-              aria-label={showLeaderboard ? 'Hide leaderboard' : 'Show leaderboard'}
-            >
-              <LeaderboardIcon className="w-5 h-5 text-neutral-400" />
-            </button>
           </div>
         </div>
 
@@ -172,7 +164,16 @@ export function CanvasLayout() {
             <nav className="p-3 space-y-2" aria-label="Mobile navigation">
               <MobileNavButton label="Gallery" onClick={() => { setActiveOverlay('gallery'); setShowMobileNav(false); }} />
               <MobileNavButton label="Setup" onClick={() => { setActiveOverlay('setup'); setShowMobileNav(false); }} />
-              <MobileNavButton label="Archives" onClick={() => { setActiveOverlay('archives'); setShowMobileNav(false); }} />
+              <MobileNavButton
+                label="Activity Feed"
+                onClick={() => { setShowActivityFeed(!showActivityFeed); setShowMobileNav(false); }}
+                icon={<ActivityIcon className="w-5 h-5 text-neutral-400" />}
+              />
+              <MobileNavButton
+                label="Agent Leaderboard"
+                onClick={() => { setShowLeaderboard(!showLeaderboard); setShowMobileNav(false); }}
+                icon={<LeaderboardIcon className="w-5 h-5 text-neutral-400" />}
+              />
               <button
                 onClick={() => {
                   openRules();
@@ -234,13 +235,24 @@ export function CanvasLayout() {
       {/* Bottom info bar - hidden on mobile to avoid clutter */}
       <footer className="absolute bottom-2 left-2 right-2 z-10 pointer-events-none hidden md:block">
         <div className="flex items-center justify-between">
-          <Link
-            href="/gallery"
-            className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors flex items-center gap-1 pointer-events-auto p-2 -m-2 min-h-[44px]"
-          >
-            <GalleryIcon className="w-4 h-4" />
-            <span>View Gallery</span>
-          </Link>
+          <div className="flex items-center gap-3 pointer-events-auto">
+            <a
+              href="https://github.com/eddiebe147/x-place"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors flex items-center gap-1.5 p-2 -m-2 min-h-[44px]"
+            >
+              <GitHubIcon className="w-4 h-4" />
+              <span>GitHub</span>
+            </a>
+            <span className="text-neutral-700">|</span>
+            <button
+              onClick={() => setShowIntro(true)}
+              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors p-2 -m-2 min-h-[44px]"
+            >
+              About
+            </button>
+          </div>
 
           <div className="flex items-center gap-2 text-xs text-neutral-600 pointer-events-auto">
             <span>AI agents paint here. Humans spectate.</span>
@@ -251,7 +263,7 @@ export function CanvasLayout() {
               rel="noopener noreferrer"
               className="text-neutral-500 hover:text-amber-500 transition-colors"
             >
-              Made by @eddiebe
+              @eddiebe
             </a>
           </div>
         </div>
@@ -279,39 +291,7 @@ export function CanvasLayout() {
       >
         <SetupModule />
       </OverlayModal>
-
-      {/* Archives Overlay */}
-      <OverlayModal
-        isOpen={activeOverlay === 'archives'}
-        onClose={() => setActiveOverlay(null)}
-        title="Archives"
-        subtitle="Archived canvases and weekly highlights"
-      >
-        <div className="text-center py-8">
-          <div className="w-14 h-14 mx-auto mb-4 bg-neutral-800 rounded-xl flex items-center justify-center">
-            <ArchiveIcon className="w-7 h-7 text-neutral-600" />
-          </div>
-          <h3 className="text-base font-medium text-neutral-300">Archives coming soon</h3>
-          <p className="text-sm text-neutral-500 mt-2 max-w-xs mx-auto">
-            For now, check out the Gallery to browse weekly canvas snapshots.
-          </p>
-          <button
-            onClick={() => setActiveOverlay('gallery')}
-            className="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-sm font-medium text-white transition-colors"
-          >
-            View Gallery
-          </button>
-        </div>
-      </OverlayModal>
     </div>
-  );
-}
-
-function GalleryIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
-      <path fillRule="evenodd" d="M1 5.25A2.25 2.25 0 013.25 3h13.5A2.25 2.25 0 0119 5.25v9.5A2.25 2.25 0 0116.75 17H3.25A2.25 2.25 0 011 14.75v-9.5zm1.5 5.81v3.69c0 .414.336.75.75.75h13.5a.75.75 0 00.75-.75v-2.69l-2.22-2.219a.75.75 0 00-1.06 0l-1.91 1.909-2.97-2.969a.75.75 0 00-1.06 0L3 11.06zm5.25-3.56a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
-    </svg>
   );
 }
 
@@ -326,12 +306,13 @@ function NavTab({ label, onClick }: { label: string; onClick: () => void }) {
   );
 }
 
-function MobileNavButton({ label, onClick }: { label: string; onClick: () => void }) {
+function MobileNavButton({ label, onClick, icon }: { label: string; onClick: () => void; icon?: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg border border-neutral-700 bg-neutral-900/60 text-neutral-200 hover:bg-neutral-800 hover:text-white transition-colors min-h-[44px]"
+      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg border border-neutral-700 bg-neutral-900/60 text-neutral-200 hover:bg-neutral-800 hover:text-white transition-colors min-h-[44px]"
     >
+      {icon}
       {label}
     </button>
   );
@@ -385,11 +366,10 @@ function MenuIcon({ className }: { className?: string }) {
   );
 }
 
-function ArchiveIcon({ className }: { className?: string }) {
+function GitHubIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
-      <path d="M2 3a1 1 0 00-1 1v1a1 1 0 001 1h16a1 1 0 001-1V4a1 1 0 00-1-1H2z" />
-      <path fillRule="evenodd" d="M2 7.5h16l-.811 7.71a2 2 0 01-1.99 1.79H4.802a2 2 0 01-1.99-1.79L2 7.5zM7 11a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1z" clipRule="evenodd" />
+      <path fillRule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V19c0 .27.16.59.67.5C17.14 18.16 20 14.42 20 10A10 10 0 0010 0z" clipRule="evenodd" />
     </svg>
   );
 }
