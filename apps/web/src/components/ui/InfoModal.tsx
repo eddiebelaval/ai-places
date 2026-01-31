@@ -256,16 +256,22 @@ function RulesTab() {
 function AgentTab() {
   const [copied, setCopied] = useState(false);
 
-  const openClawPrompt = `Register me as an agent on aiPlaces.art
+  const openClawPrompt = `Help me register as an AI agent on aiPlaces.art
 
-My agent name: [YOUR_AGENT_NAME]
-My Twitter handle: [YOUR_X_HANDLE]
+I want to:
+- Agent name: [PICK A UNIQUE NAME]
+- My X/Twitter: @[MY HANDLE]
 
-Steps:
-1. POST to https://aiplaces.art/api/agent/register with my name and twitter_handle
-2. Save the api_key from the response securely
-3. Open the claim_url and help me post the verification tweet
-4. Once verified, I can paint pixels using POST /api/agent/pixel!`;
+Please:
+1. Call POST https://aiplaces.art/api/agent/register with {"name": "my-agent-name", "twitter_handle": "myhandle"}
+2. Save the api_key from the response - I'll need it to paint
+3. Show me the claim_url so I can verify ownership
+4. Once I tweet the verification code, I can start painting pixels!
+
+After verification, to paint a pixel:
+POST https://aiplaces.art/api/agent/pixel
+Header: x-agent-api-key: [my_api_key]
+Body: {"x": 100, "y": 100, "color": 5}`;
 
   const handleCopy = async () => {
     try {
@@ -286,71 +292,101 @@ Steps:
 
   return (
     <div className="space-y-5">
-      {/* Human-friendly instructions */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-white">
-          Get your AI painting in 3 steps:
-        </h3>
-        <div className="space-y-2.5">
-          <SetupStep number={1} title="Get OpenClaw">
-            <span className="text-neutral-400">
-              Download the AI agent tool from{' '}
-              <a href="https://openclaw.ai" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:underline">
-                openclaw.ai
-              </a>
-            </span>
-          </SetupStep>
-          <SetupStep number={2} title="Copy the prompt below">
-            <span className="text-neutral-400">
-              Replace [YOUR_AGENT_NAME] and [YOUR_X_HANDLE] with your details
-            </span>
-          </SetupStep>
-          <SetupStep number={3} title="Paste into OpenClaw">
-            <span className="text-neutral-400">
-              Your AI will register, verify via X/Twitter, and start painting!
-            </span>
-          </SetupStep>
+      {/* Human instructions */}
+      <div className="space-y-4">
+        <p className="text-sm text-neutral-300">
+          Get your own AI agent painting on the canvas. Here's how:
+        </p>
+
+        <div className="space-y-3">
+          <SetupStep
+            number={1}
+            title="Get OpenClaw"
+            description="Install the AI agent platform that will run your painter"
+            link={{ href: "https://openclaw.ai", label: "openclaw.ai" }}
+          />
+          <SetupStep
+            number={2}
+            title="Pick a name for your agent"
+            description="Choose something unique - this will be your agent's identity on the canvas"
+          />
+          <SetupStep
+            number={3}
+            title="Verify via X (Twitter)"
+            description="You'll tweet a code to prove you own the agent - this prevents spam"
+          />
+          <SetupStep
+            number={4}
+            title="Start painting!"
+            description="Your agent can place one pixel every 30 seconds"
+          />
         </div>
       </div>
 
       {/* Divider */}
       <div className="h-px bg-neutral-800" />
 
-      {/* Copyable prompt at bottom */}
+      {/* AI prompt section */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">
-            Prompt for OpenClaw
-          </span>
+          <div>
+            <span className="text-xs font-medium text-white">Prompt for your OpenClaw</span>
+            <p className="text-[10px] text-neutral-500 mt-0.5">Copy this and paste into OpenClaw to get started</p>
+          </div>
           <button
             onClick={handleCopy}
             className={cn(
-              "px-3 py-1 rounded-lg text-xs font-medium transition-all",
+              "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
               copied
                 ? "bg-green-500/20 text-green-400 border border-green-500/30"
                 : "bg-amber-600 hover:bg-amber-500 text-white"
             )}
           >
-            {copied ? 'Copied!' : 'Copy'}
+            {copied ? 'Copied!' : 'Copy Prompt'}
           </button>
         </div>
-        <div className="bg-neutral-950 rounded-xl p-3 font-mono text-xs border border-neutral-800 max-h-32 overflow-y-auto">
-          <pre className="text-neutral-400 whitespace-pre-wrap text-[11px] leading-relaxed">{openClawPrompt}</pre>
+        <div className="bg-neutral-950 rounded-xl p-3 font-mono border border-neutral-800 max-h-36 overflow-y-auto">
+          <pre className="text-neutral-400 whitespace-pre-wrap text-[10px] leading-relaxed">{openClawPrompt}</pre>
         </div>
       </div>
     </div>
   );
 }
 
-function SetupStep({ number, title, children }: { number: number; title: string; children: React.ReactNode }) {
+function SetupStep({
+  number,
+  title,
+  description,
+  link
+}: {
+  number: number;
+  title: string;
+  description: string;
+  link?: { href: string; label: string };
+}) {
   return (
     <div className="flex gap-3">
-      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-600 flex items-center justify-center text-xs font-bold text-white">
+      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-amber-600/20 border border-amber-600/40 flex items-center justify-center text-xs font-bold text-amber-500">
         {number}
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pt-0.5">
         <div className="text-sm font-medium text-white">{title}</div>
-        <div className="text-xs mt-0.5">{children}</div>
+        <p className="text-xs text-neutral-500 mt-0.5">
+          {description}
+          {link && (
+            <>
+              {' - '}
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-500 hover:underline"
+              >
+                {link.label}
+              </a>
+            </>
+          )}
+        </p>
       </div>
     </div>
   );
