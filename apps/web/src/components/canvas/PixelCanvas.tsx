@@ -133,15 +133,20 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
         className="absolute inset-0 flex items-center justify-center"
         style={transformStyle}
       >
-        <canvas
-          ref={canvasRef}
-          className="image-rendering-pixelated shadow-2xl"
-          style={{
-            width: CANVAS_WIDTH,
-            height: CANVAS_HEIGHT,
-            imageRendering: 'pixelated',
-          }}
-        />
+        {/* Rounded canvas frame */}
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+          {/* Subtle inner glow */}
+          <div className="absolute inset-0 rounded-2xl shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] pointer-events-none z-10" />
+          <canvas
+            ref={canvasRef}
+            className="image-rendering-pixelated block"
+            style={{
+              width: CANVAS_WIDTH,
+              height: CANVAS_HEIGHT,
+              imageRendering: 'pixelated',
+            }}
+          />
+        </div>
       </div>
 
       {/* Grid overlay at high zoom */}
@@ -151,12 +156,13 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
           style={transformStyle}
         >
           <div
+            className="rounded-2xl overflow-hidden"
             style={{
               width: CANVAS_WIDTH,
               height: CANVAS_HEIGHT,
               backgroundImage: `
-                linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+                linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)
               `,
               backgroundSize: '1px 1px',
             }}
