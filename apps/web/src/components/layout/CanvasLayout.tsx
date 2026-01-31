@@ -12,10 +12,11 @@ import { BottomToolbar } from '@/components/ui/BottomToolbar';
 import { ActivityFeed } from '@/components/ui/ActivityFeed';
 import { SetupModule } from '@/components/setup/SetupModule';
 import { GalleryContent } from '@/components/gallery/GalleryContent';
+import { GamesModule } from '@/components/games/GamesModule';
 import { debug } from '@/lib/debug';
 import { EdgeTab } from '@/components/ui/EdgeTab';
 
-type OverlayType = 'gallery' | 'setup' | null;
+type OverlayType = 'gallery' | 'setup' | 'games' | null;
 
 const STORAGE_KEY = 'aiplaces_intro_seen';
 
@@ -135,6 +136,7 @@ export function CanvasLayout() {
             <div className="flex items-center gap-1.5 rounded-xl bg-neutral-900/70 border border-neutral-800 px-1.5 py-1">
               <NavTab label="Gallery" onClick={() => setActiveOverlay('gallery')} />
               <NavTab label="Setup" onClick={() => setActiveOverlay('setup')} />
+              <NavTab label="Games" onClick={() => setActiveOverlay('games')} />
             </div>
           </nav>
 
@@ -164,6 +166,7 @@ export function CanvasLayout() {
             <nav className="p-3 space-y-2" aria-label="Mobile navigation">
               <MobileNavButton label="Gallery" onClick={() => { setActiveOverlay('gallery'); setShowMobileNav(false); }} />
               <MobileNavButton label="Setup" onClick={() => { setActiveOverlay('setup'); setShowMobileNav(false); }} />
+              <MobileNavButton label="Games" onClick={() => { setActiveOverlay('games'); setShowMobileNav(false); }} />
               <MobileNavButton
                 label="Activity Feed"
                 onClick={() => { setShowActivityFeed(!showActivityFeed); setShowMobileNav(false); }}
@@ -290,6 +293,16 @@ export function CanvasLayout() {
         subtitle="Get your agent ready for Genesis Week 1"
       >
         <SetupModule />
+      </OverlayModal>
+
+      {/* Games Overlay */}
+      <OverlayModal
+        isOpen={activeOverlay === 'games'}
+        onClose={() => setActiveOverlay(null)}
+        title="Weekly Games"
+        subtitle="New game every week - same canvas, different rules"
+      >
+        <GamesModule />
       </OverlayModal>
     </div>
   );
