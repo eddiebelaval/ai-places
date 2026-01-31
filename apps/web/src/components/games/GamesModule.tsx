@@ -31,24 +31,29 @@ export function GamesModule({ className }: { className?: string }) {
       </div>
 
       {/* Current Game Card */}
-      <div className="bg-gradient-to-br from-amber-600/10 to-orange-600/5 rounded-xl border border-amber-600/30 p-4">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-amber-500 uppercase tracking-wider">
-                Week {CURRENT_GAME.week}
-              </span>
-              <span className="px-1.5 py-0.5 bg-green-500/20 text-green-400 text-[10px] font-medium rounded">
-                LIVE
-              </span>
+      <div className="group relative bg-gradient-to-br from-amber-600/10 via-orange-600/8 to-orange-600/5 rounded-xl border border-amber-600/30 p-5 shadow-lg shadow-amber-900/10 overflow-hidden transition-all duration-300 hover:border-amber-500/40 hover:shadow-xl hover:shadow-amber-600/20">
+        {/* Animated glow effect on hover */}
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-600/5 via-transparent to-orange-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        <div className="relative">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-xs font-semibold text-amber-500 uppercase tracking-wider">
+                  Week {CURRENT_GAME.week}
+                </span>
+                <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-wide rounded-full border border-green-500/30 animate-pulse">
+                  LIVE
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-white leading-tight">{CURRENT_GAME.name}</h3>
             </div>
-            <h3 className="text-lg font-bold text-white mt-1">{CURRENT_GAME.name}</h3>
+            <div className="w-12 h-12 rounded-xl bg-amber-600/20 border border-amber-600/40 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:bg-amber-600/30 group-hover:border-amber-500/50 group-hover:scale-110">
+              <GameIcon className="w-6 h-6 text-amber-500 transition-transform duration-300 group-hover:scale-110" />
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-amber-600/20 border border-amber-600/40 flex items-center justify-center">
-            <GameIcon className="w-5 h-5 text-amber-500" />
-          </div>
+          <p className="text-sm text-neutral-300 leading-relaxed">{CURRENT_GAME.description}</p>
         </div>
-        <p className="text-sm text-neutral-300">{CURRENT_GAME.description}</p>
       </div>
 
       {/* Divider */}
@@ -56,34 +61,34 @@ export function GamesModule({ className }: { className?: string }) {
 
       {/* Rules */}
       <div>
-        <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+        <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
           <RulesIcon className="w-4 h-4 text-amber-500" />
           Rules
         </h4>
-        <ul className="space-y-2">
+        <ul className="space-y-2.5">
           {CURRENT_GAME.rules.map((rule, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-xs text-neutral-400">
-              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-[10px] font-medium text-neutral-300">
+            <li key={i} className="flex items-start gap-3 text-sm text-neutral-400 leading-relaxed">
+              <span className="flex-shrink-0 w-5 h-5 mt-0.5 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-[10px] font-semibold text-neutral-300">
                 {i + 1}
               </span>
-              <span className="pt-0.5">{rule}</span>
+              <span className="flex-1">{rule}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Strategy Tip */}
-      <div className="bg-neutral-900/50 rounded-lg border border-neutral-800 p-3">
-        <div className="flex items-center gap-2 mb-1.5">
+      <div className="bg-neutral-900/60 rounded-lg border border-neutral-800/80 p-4 shadow-md shadow-neutral-950/50">
+        <div className="flex items-center gap-2 mb-2">
           <LightbulbIcon className="w-4 h-4 text-yellow-500" />
-          <span className="text-xs font-medium text-yellow-500">Strategy Tip</span>
+          <span className="text-xs font-semibold text-yellow-500 uppercase tracking-wider">Strategy Tip</span>
         </div>
-        <p className="text-xs text-neutral-400">{CURRENT_GAME.strategy}</p>
+        <p className="text-sm text-neutral-400 leading-relaxed">{CURRENT_GAME.strategy}</p>
       </div>
 
       {/* Upcoming Games Preview */}
       <div>
-        <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+        <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
           <CalendarIcon className="w-4 h-4 text-neutral-500" />
           Coming Soon
         </h4>
@@ -99,9 +104,9 @@ export function GamesModule({ className }: { className?: string }) {
 
 function UpcomingGame({ week, name }: { week: number; name: string }) {
   return (
-    <div className="flex items-center gap-3 px-3 py-2 bg-neutral-900/30 rounded-lg border border-neutral-800/50">
-      <span className="text-xs text-neutral-600">Week {week}</span>
-      <span className="text-xs text-neutral-400">{name}</span>
+    <div className="flex items-center gap-3 px-3 py-2.5 bg-neutral-900/40 rounded-lg border border-neutral-800/60 transition-all duration-200 hover:bg-neutral-900/60 hover:border-neutral-700 group">
+      <span className="text-xs font-medium text-neutral-600 group-hover:text-neutral-500 transition-colors">Week {week}</span>
+      <span className="text-xs text-neutral-400 group-hover:text-neutral-300 transition-colors">{name}</span>
     </div>
   );
 }

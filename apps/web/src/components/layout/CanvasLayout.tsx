@@ -92,7 +92,7 @@ export function CanvasLayout() {
         className="absolute top-0 left-0 right-0 z-10 pointer-events-none"
         role="banner"
       >
-        <div className="flex items-center justify-between px-3 md:px-5 py-2.5 md:py-3 bg-neutral-950 border-b border-neutral-800">
+        <div className="flex items-center justify-between px-3 md:px-5 py-2.5 md:py-3 bg-neutral-950/95 border-b border-neutral-800/80 backdrop-blur-sm">
           {/* Left side: Branding + Connection */}
           <div className="flex items-center gap-2 md:gap-4 pointer-events-auto">
             {/* Logo/Branding - Lobster artist mascot */}
@@ -133,7 +133,7 @@ export function CanvasLayout() {
             className="pointer-events-auto hidden md:flex flex-1 items-center justify-center px-2"
             aria-label="Primary"
           >
-            <div className="flex items-center gap-1.5 rounded-xl bg-neutral-900/70 border border-neutral-800 px-1.5 py-1">
+            <div className="flex items-center gap-2 rounded-xl bg-neutral-900/80 border border-neutral-800/80 px-2 py-1.5 shadow-lg shadow-neutral-950/50 backdrop-blur-sm">
               <NavTab label="Gallery" onClick={() => setActiveOverlay('gallery')} />
               <NavTab label="Setup" onClick={() => setActiveOverlay('setup')} />
               <NavTab label="Games" onClick={() => setActiveOverlay('games')} />
@@ -145,12 +145,12 @@ export function CanvasLayout() {
             {/* Mobile hamburger menu */}
             <button
               onClick={() => setShowMobileNav(!showMobileNav)}
-              className="md:hidden p-2.5 hover:bg-neutral-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="md:hidden p-2.5 hover:bg-neutral-800 rounded-lg transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               title="Menu"
               aria-label="Toggle menu"
               aria-expanded={showMobileNav}
             >
-              <MenuIcon className="w-6 h-6 text-neutral-400" />
+              <MenuIcon className="w-6 h-6 text-neutral-400 hover:text-neutral-300" />
             </button>
 
             {/* Week Countdown - hidden on small mobile */}
@@ -162,7 +162,7 @@ export function CanvasLayout() {
 
         {/* Mobile dropdown menu */}
         {showMobileNav && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-neutral-950 border-b border-neutral-800 pointer-events-auto">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-neutral-950/98 border-b border-neutral-800/80 pointer-events-auto backdrop-blur-sm shadow-lg shadow-neutral-950/50">
             <nav className="p-3 space-y-2" aria-label="Mobile navigation">
               <MobileNavButton label="Gallery" onClick={() => { setActiveOverlay('gallery'); setShowMobileNav(false); }} />
               <MobileNavButton label="Setup" onClick={() => { setActiveOverlay('setup'); setShowMobileNav(false); }} />
@@ -182,7 +182,7 @@ export function CanvasLayout() {
                   openRules();
                   setShowMobileNav(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg border border-amber-600/40 bg-amber-600/20 text-amber-400 hover:bg-amber-600/30 transition-colors min-h-[44px]"
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-sm font-medium rounded-lg border border-amber-600/40 bg-amber-600/20 text-amber-400 hover:bg-amber-600/30 hover:border-amber-500/50 active:scale-98 transition-all duration-200 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 <RulesIcon className="w-5 h-5 text-amber-500" />
                 Rules
@@ -199,11 +199,11 @@ export function CanvasLayout() {
           {/* Collapse chevron */}
           <button
             onClick={() => setShowActivityFeed(false)}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 rounded-r-lg flex items-center justify-center transition-colors"
+            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-neutral-900/95 hover:bg-neutral-800 border border-neutral-700/80 hover:border-neutral-600 rounded-r-lg flex items-center justify-center transition-all duration-200 shadow-lg shadow-neutral-950/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             title="Hide activity feed"
             aria-label="Hide activity feed"
           >
-            <ChevronLeftIcon className="w-4 h-4 text-neutral-400" />
+            <ChevronLeftIcon className="w-4 h-4 text-neutral-400 group-hover:text-neutral-300" />
           </button>
         </aside>
       )}
@@ -222,11 +222,11 @@ export function CanvasLayout() {
             {/* Close button for mobile / Collapse chevron for desktop */}
             <button
               onClick={() => setShowLeaderboard(false)}
-              className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 rounded-l-lg flex items-center justify-center transition-colors"
+              className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-neutral-900/95 hover:bg-neutral-800 border border-neutral-700/80 hover:border-neutral-600 rounded-l-lg flex items-center justify-center transition-all duration-200 shadow-lg shadow-neutral-950/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               title="Hide leaderboard"
               aria-label="Hide leaderboard"
             >
-              <ChevronRightIcon className="w-4 h-4 text-neutral-400" />
+              <ChevronRightIcon className="w-4 h-4 text-neutral-400 group-hover:text-neutral-300" />
             </button>
           </aside>
         </>
@@ -243,7 +243,7 @@ export function CanvasLayout() {
               href="https://github.com/eddiebe147/x-place"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors flex items-center gap-1.5 p-2 -m-2 min-h-[44px]"
+              className="text-xs text-neutral-500 hover:text-neutral-300 transition-all duration-200 flex items-center gap-1.5 p-2 -m-2 min-h-[44px] rounded-md hover:bg-neutral-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             >
               <GitHubIcon className="w-4 h-4" />
               <span>GitHub</span>
@@ -251,7 +251,7 @@ export function CanvasLayout() {
             <span className="text-neutral-700">|</span>
             <button
               onClick={() => setShowIntro(true)}
-              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors p-2 -m-2 min-h-[44px]"
+              className="text-xs text-neutral-500 hover:text-neutral-300 transition-all duration-200 p-2 -m-2 min-h-[44px] rounded-md hover:bg-neutral-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             >
               About
             </button>
@@ -264,7 +264,7 @@ export function CanvasLayout() {
               href="https://x.com/eddiebe"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-neutral-500 hover:text-amber-500 transition-colors"
+              className="text-neutral-500 hover:text-amber-500 transition-all duration-200 px-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             >
               @eddiebe
             </a>
@@ -312,7 +312,7 @@ function NavTab({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border border-neutral-700 bg-neutral-900/60 text-neutral-200 hover:bg-neutral-800 hover:text-white transition-colors"
+      className="px-3 py-2 text-sm font-semibold rounded-lg border border-neutral-700/80 bg-neutral-900/60 text-neutral-200 hover:bg-neutral-800 hover:text-white hover:border-neutral-600 hover:shadow-md hover:shadow-neutral-900/50 transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
     >
       {label}
     </button>
@@ -323,7 +323,7 @@ function MobileNavButton({ label, onClick, icon }: { label: string; onClick: () 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg border border-neutral-700 bg-neutral-900/60 text-neutral-200 hover:bg-neutral-800 hover:text-white transition-colors min-h-[44px]"
+      className="w-full flex items-center gap-3 px-4 py-3.5 text-sm font-medium rounded-lg border border-neutral-700/80 bg-neutral-900/60 text-neutral-200 hover:bg-neutral-800 hover:text-white hover:border-neutral-600 active:scale-98 transition-all duration-200 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
     >
       {icon}
       {label}
