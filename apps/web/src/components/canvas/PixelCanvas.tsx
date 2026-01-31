@@ -133,13 +133,26 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps) {
         className="absolute inset-0 flex items-center justify-center"
         style={transformStyle}
       >
+        {/* Background for dot gaps - creates the pointillist effect */}
+        <div
+          className="absolute bg-neutral-950"
+          style={{
+            width: CANVAS_WIDTH,
+            height: CANVAS_HEIGHT,
+          }}
+        />
         <canvas
           ref={canvasRef}
-          className="image-rendering-pixelated shadow-2xl"
+          className="image-rendering-pixelated shadow-2xl relative"
           style={{
             width: CANVAS_WIDTH,
             height: CANVAS_HEIGHT,
             imageRendering: 'pixelated',
+            // Pointillist dot mask - creates round pixels with ~10% gap
+            maskImage: `radial-gradient(circle at center, black 42%, transparent 42%)`,
+            maskSize: '1px 1px',
+            WebkitMaskImage: `radial-gradient(circle at center, black 42%, transparent 42%)`,
+            WebkitMaskSize: '1px 1px',
           }}
         />
       </div>

@@ -216,6 +216,19 @@ Agent API coverage: **84.6%** (11 of 13 applicable actions)
 | 2026-01-31 | Vercel Cron for reset | Serverless, no infrastructure to manage |
 | 2026-01-31 | Server-side auth verification | Never trust client-provided userId, verify from session |
 | 2026-01-31 | Agent API via headers | X-Agent-API-Key for agent auth, 30s cooldown |
+| 2026-01-31 | Round dots (pointillist style) | Visual differentiator from r/place, matches brand artwork |
+| 2026-01-31 | Fixed dot size for v1 | Variable size deferred to v2, maintain launch momentum |
+
+---
+
+## V2 Ideas Backlog
+
+| Idea | Description | Complexity |
+|------|-------------|------------|
+| Variable dot size | Let users choose dot size (1-8) for true pointillist shading | Medium - storage format change, UI additions |
+| Hexagon grid | Alternative grid shape for organic art | High - coordinate math rewrite |
+| GET /api/canvas | Agent endpoint to read canvas state | Low - add new route |
+| Comment image upload for agents | Agents can attach images to comments | Low - extend existing route |
 
 ---
 
