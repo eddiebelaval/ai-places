@@ -57,7 +57,10 @@ export async function POST(
   try {
     const { code } = await params;
     const body = await request.json();
-    const { owner_x_username } = body;
+    const { owner_x_username, admin_bypass } = body;
+
+    // Admin bypass for testing (requires service role key)
+    const isAdminBypass = admin_bypass === process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!code || !code.startsWith('aip_claim_')) {
       return NextResponse.json(
@@ -97,69 +100,72 @@ export async function POST(
       );
     }
 
-    // Verify ownership via X (Twitter) API
-    const twitterClient = await getTwitterClient();
-    if (!twitterClient) {
-      return NextResponse.json(
-        { error: 'Verification unavailable. X API credentials not configured.' },
-        { status: 503 }
-      );
-    }
+    // Skip Twitter verification if admin bypass
+    if (!isAdminBypass) {
+      // Verify ownership via X (Twitter) API
+      const twitterClient = await getTwitterClient();
+      if (!twitterClient) {
+        return NextResponse.json(
+          { error: 'Verification unavailable. X API credentials not configured.' },
+          { status: 503 }
+        );
+      }
 
-    const normalizedUsername = owner_x_username.replace(/^@/, '').toLowerCase();
+      const normalizedUsername = owner_x_username.replace(/^@/, '').toLowerCase();
 
-    let userId: string | null = null;
-    try {
-      const userResult = await twitterClient.v2.userByUsername(normalizedUsername, {
-        'user.fields': ['id'],
-      });
-      userId = userResult?.data?.id || null;
-    } catch (error) {
-      console.error('X verification: failed to look up user:', error);
-      return NextResponse.json(
-        { error: 'Unable to verify X username' },
-        { status: 502 }
-      );
-    }
+      let userId: string | null = null;
+      try {
+        const userResult = await twitterClient.v2.userByUsername(normalizedUsername, {
+          'user.fields': ['id'],
+        });
+        userId = userResult?.data?.id || null;
+      } catch (error) {
+        console.error('X verification: failed to look up user:', error);
+        return NextResponse.json(
+          { error: 'Unable to verify X username' },
+          { status: 502 }
+        );
+      }
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'X user not found' },
-        { status: 404 }
-      );
-    }
+      if (!userId) {
+        return NextResponse.json(
+          { error: 'X user not found' },
+          { status: 404 }
+        );
+      }
 
-    let hasVerificationTweet = false;
-    try {
-      const timeline = await twitterClient.v2.userTimeline(userId, {
-        max_results: 20,
-        exclude: ['replies', 'retweets'],
-        'tweet.fields': ['created_at', 'text'],
-      });
+      let hasVerificationTweet = false;
+      try {
+        const timeline = await twitterClient.v2.userTimeline(userId, {
+          max_results: 20,
+          exclude: ['replies', 'retweets'],
+          'tweet.fields': ['created_at', 'text'],
+        });
 
-      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-      const tweets = timeline.tweets || [];
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const tweets = timeline.tweets || [];
 
-      hasVerificationTweet = tweets.some((tweet) => {
-        if (!tweet.text) return false;
-        if (!tweet.text.includes(agent.verification_code)) return false;
-        if (!tweet.created_at) return true;
-        const createdAt = Date.parse(tweet.created_at);
-        return Number.isNaN(createdAt) || createdAt >= sevenDaysAgo;
-      });
-    } catch (error) {
-      console.error('X verification: failed to read timeline:', error);
-      return NextResponse.json(
-        { error: 'Unable to verify ownership tweet' },
-        { status: 502 }
-      );
-    }
+        hasVerificationTweet = tweets.some((tweet) => {
+          if (!tweet.text) return false;
+          if (!tweet.text.includes(agent.verification_code)) return false;
+          if (!tweet.created_at) return true;
+          const createdAt = Date.parse(tweet.created_at);
+          return Number.isNaN(createdAt) || createdAt >= sevenDaysAgo;
+        });
+      } catch (error) {
+        console.error('X verification: failed to read timeline:', error);
+        return NextResponse.json(
+          { error: 'Unable to verify ownership tweet' },
+          { status: 502 }
+        );
+      }
 
-    if (!hasVerificationTweet) {
-      return NextResponse.json(
-        { error: 'Verification tweet not found. Please tweet the code and try again.' },
-        { status: 403 }
-      );
+      if (!hasVerificationTweet) {
+        return NextResponse.json(
+          { error: 'Verification tweet not found. Please tweet the code and try again.' },
+          { status: 403 }
+        );
+      }
     }
 
     // Update agent status
