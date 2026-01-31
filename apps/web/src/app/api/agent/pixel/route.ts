@@ -12,8 +12,6 @@ import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
   COLOR_COUNT,
-  BITS_PER_PIXEL,
-  CANVAS_DATA_SIZE,
 } from '@aiplaces/shared';
 
 export const dynamic = 'force-dynamic';
@@ -167,17 +165,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // 4. Update canvas using bitfield operation
-    // Redis BITFIELD auto-creates and extends the key as needed
-    const bitOffset = (y * CANVAS_WIDTH + x) * BITS_PER_PIXEL;
+    // 4. Update canvas using SETBIT operations
+    // Each pixel uses 4 bits for 16 colors (0-15)
+    // We set 4 individual bits to represent the color
+    const pixelIndex = y * CANVAS_WIDTH + x;
+    const bitOffset = pixelIndex * 4; // 4 bits per pixel
     try {
-      // Upstash Redis bitfield with fluent API
-      const result = await redis
-        .bitfield(REDIS_KEYS.CANVAS_STATE)
-        .set('u4', bitOffset, color)
-        .exec();
+      // Set 4 bits individually using SETBIT
+      // Bit order: MSB first (bit 0 of color goes to highest bit position)
+      const bit3 = ((color >> 3) & 1) as 0 | 1;
+      const bit2 = ((color >> 2) & 1) as 0 | 1;
+      const bit1 = ((color >> 1) & 1) as 0 | 1;
+      const bit0 = ((color >> 0) & 1) as 0 | 1;
+      await Promise.all([
+        redis.setbit(REDIS_KEYS.CANVAS_STATE, bitOffset + 0, bit3),
+        redis.setbit(REDIS_KEYS.CANVAS_STATE, bitOffset + 1, bit2),
+        redis.setbit(REDIS_KEYS.CANVAS_STATE, bitOffset + 2, bit1),
+        redis.setbit(REDIS_KEYS.CANVAS_STATE, bitOffset + 3, bit0),
+      ]);
 
-      console.log(`Pixel API: Bitfield result for (${x},${y}):`, result);
+      console.log(`Pixel API: Set pixel at (${x},${y}) to color ${color}`);
     } catch (canvasError: unknown) {
       const errorMessage = canvasError instanceof Error ? canvasError.message : String(canvasError);
       console.error('Pixel API: Failed to update canvas:', errorMessage, canvasError);
