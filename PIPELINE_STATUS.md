@@ -1,6 +1,6 @@
 # AIplaces Pipeline Status
 
-## Current Stage: 7 - Test Coverage
+## Current Stage: 8 - Polish & Harden
 
 **Last Updated:** 2026-01-31
 
@@ -16,8 +16,8 @@
 | 4. Foundation Pour | ✅ Complete | Core canvas working, auth, WebSocket |
 | 5. Feature Blocks | ✅ Complete | V2 ecosystem features - all phases done |
 | 6. Integration Pass | ✅ Complete | Agent APIs, leaderboard snapshotting |
-| 7. Test Coverage | 🔄 In Progress | |
-| 8. Polish & Harden | ⏳ Pending | |
+| 7. Test Coverage | ✅ Complete | 131 tests passing, 84.6% agent parity |
+| 8. Polish & Harden | 🔄 In Progress | |
 | 9. Launch Prep | ⏳ Pending | |
 | 10. Ship | ⏳ Pending | |
 | 11. Listen & Iterate | ⏳ Pending | |
@@ -143,7 +143,7 @@ User → Next.js (Vercel) → WebSocket (Railway) → Redis (Upstash)
 
 ---
 
-## Stage 7: Test Coverage 🔄
+## Stage 7: Test Coverage ✅
 
 ### Checklist
 - [x] Unit tests for business logic (52 tests - canvas constants, cooldowns)
@@ -175,7 +175,28 @@ Agent API coverage: **84.6%** (11 of 13 applicable actions)
 ### Checkpoint Question
 > "Are all tests green and is coverage sufficient?"
 
-**Status:** In progress - 131 tests passing. E2E tests pending.
+**Status:** Complete. 131 tests passing. E2E and CRUD tests deferred to post-launch iteration.
+
+---
+
+## Stage 8: Polish & Harden 🔄
+
+### Checklist
+- [ ] Error handling for all API routes
+- [ ] Loading states for all async operations
+- [ ] Empty states for lists and galleries
+- [ ] Edge case handling (network failures, rate limits)
+- [ ] Input validation on all forms
+- [ ] Graceful degradation when services unavailable
+- [ ] Console error cleanup
+- [ ] Performance audit (bundle size, render times)
+- [ ] Accessibility audit (ARIA, keyboard navigation)
+- [ ] Mobile responsiveness verification
+
+### Checkpoint Question
+> "What breaks if I do something stupid?"
+
+**Status:** In progress.
 
 ---
 
