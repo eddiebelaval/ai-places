@@ -114,6 +114,9 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps) {
         isDragging ? 'cursor-grabbing' : 'cursor-crosshair'
       )}
       onClick={handleClick}
+      tabIndex={0}
+      role="img"
+      aria-label={`Pixel canvas, ${CANVAS_WIDTH} by ${CANVAS_HEIGHT} pixels. Use arrow keys to pan, plus and minus to zoom, zero to reset view.`}
     >
       {/* Loading state */}
       {isLoading && (

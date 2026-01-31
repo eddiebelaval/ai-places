@@ -49,7 +49,11 @@ export function BottomToolbar() {
       <div className="bg-neutral-900/95 backdrop-blur-md rounded-2xl border border-neutral-800 shadow-2xl">
         {/* Color Palette - 2 rows of 8 */}
         <div className="px-4 pt-4 pb-3">
-          <div className="grid grid-cols-8 gap-1.5">
+          <div
+            className="grid grid-cols-8 gap-1.5"
+            role="radiogroup"
+            aria-label="Color palette"
+          >
             {colorEntries.map(([index, hex]) => {
               const colorIndex = parseInt(index) as ColorIndex;
               const isSelected = selectedColor === colorIndex;
@@ -66,6 +70,9 @@ export function BottomToolbar() {
                   )}
                   style={{ backgroundColor: hex }}
                   title={COLOR_NAMES[colorIndex]}
+                  role="radio"
+                  aria-checked={isSelected}
+                  aria-label={`Select ${COLOR_NAMES[colorIndex]} color`}
                 />
               );
             })}

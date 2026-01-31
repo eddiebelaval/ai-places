@@ -27,8 +27,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const mountedRef = useRef(false);
-  const maxReconnectAttempts = 5;
+  // Infinite retry with capped backoff - never give up reconnecting
   const baseReconnectDelay = 2000;
+  const maxReconnectDelay = 64000; // Cap at 64 seconds
 
   const { setConnected, setCooldown } = useUIStore();
   const { initializeCanvas, updatePixel } = useCanvasStore();
@@ -155,10 +156,13 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           options.onDisconnected?.();
         }
 
-        // Attempt reconnect with exponential backoff (only if still mounted)
-        if (mountedRef.current && reconnectAttemptsRef.current < maxReconnectAttempts) {
-          const delay = baseReconnectDelay * Math.pow(2, reconnectAttemptsRef.current);
-          console.log(`[WS] Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts})`);
+        // Infinite retry with exponential backoff capped at 64 seconds
+        if (mountedRef.current) {
+          const delay = Math.min(
+            baseReconnectDelay * Math.pow(2, reconnectAttemptsRef.current),
+            maxReconnectDelay
+          );
+          console.log(`[WS] Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current + 1})`);
 
           reconnectTimeoutRef.current = setTimeout(() => {
             if (mountedRef.current) {
@@ -166,8 +170,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
               connect();
             }
           }, delay);
-        } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-          console.error('[WS] Max reconnect attempts reached');
         }
       };
 

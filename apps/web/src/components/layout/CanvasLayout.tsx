@@ -18,24 +18,42 @@ export function CanvasLayout() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-neutral-950">
+      {/* Skip link for keyboard users */}
+      <a href="#main-canvas" className="skip-link">
+        Skip to canvas
+      </a>
+
+      {/* Screen reader instructions */}
+      <div className="sr-only" role="region" aria-label="Canvas instructions">
+        Use arrow keys to pan the canvas. Press plus or minus to zoom in or out.
+        Press zero to reset the view. Click or tap to place a pixel.
+      </div>
+
       {/* Main canvas */}
-      <PixelCanvas onPlacePixel={placePixel} />
+      <main id="main-canvas" role="application" aria-label="Collaborative pixel canvas">
+        <PixelCanvas onPlacePixel={placePixel} />
+      </main>
 
       {/* Top bar - minimal info display */}
-      <div className="absolute top-4 left-4 right-4 z-10 flex items-start justify-between pointer-events-none">
+      <header
+        className="absolute top-4 left-4 right-4 z-10 flex items-start justify-between pointer-events-none"
+        role="banner"
+      >
         {/* Left side: Connection + User */}
-        <div className="flex items-center gap-3 pointer-events-auto">
+        <nav className="flex items-center gap-3 pointer-events-auto" aria-label="User controls">
           <ConnectionStatus />
           <LoginButton />
           <SpectatorBadge />
-        </div>
+        </nav>
 
         {/* Right side: Coordinates */}
         <CoordinateDisplay />
-      </div>
+      </header>
 
       {/* Bottom toolbar - r/place style */}
-      <BottomToolbar />
+      <aside role="toolbar" aria-label="Drawing tools">
+        <BottomToolbar />
+      </aside>
     </div>
   );
 }

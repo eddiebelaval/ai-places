@@ -193,6 +193,90 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
     }));
   }, []);
 
+  // Zoom in
+  const zoomIn = useCallback(() => {
+    setViewport((prev) => ({
+      ...prev,
+      targetZoom: Math.min(ZOOM.MAX, prev.targetZoom * 1.5),
+    }));
+  }, []);
+
+  // Zoom out
+  const zoomOut = useCallback(() => {
+    setViewport((prev) => ({
+      ...prev,
+      targetZoom: Math.max(ZOOM.MIN, prev.targetZoom / 1.5),
+    }));
+  }, []);
+
+  // Reset view to center
+  const resetView = useCallback(() => {
+    setViewport((prev) => ({
+      ...prev,
+      targetX: 0,
+      targetY: 0,
+      targetZoom: ZOOM.DEFAULT,
+    }));
+  }, []);
+
+  // Pan by pixels
+  const pan = useCallback((dx: number, dy: number) => {
+    setViewport((prev) => ({
+      ...prev,
+      targetX: prev.targetX + dx,
+      targetY: prev.targetY + dy,
+    }));
+  }, []);
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      // Only handle if canvas container is focused
+      if (!container.contains(document.activeElement) && document.activeElement !== container) {
+        return;
+      }
+
+      const panStep = 50; // Pixels to pan per keypress
+
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          pan(0, panStep);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          pan(0, -panStep);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          pan(panStep, 0);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          pan(-panStep, 0);
+          break;
+        case '+':
+        case '=':
+          e.preventDefault();
+          zoomIn();
+          break;
+        case '-':
+        case '_':
+          e.preventDefault();
+          zoomOut();
+          break;
+        case '0':
+          e.preventDefault();
+          resetView();
+          break;
+      }
+    },
+    [containerRef, pan, zoomIn, zoomOut, resetView]
+  );
+
   // Get canvas coordinates from screen position
   const getCanvasCoords = useCallback(
     (screenX: number, screenY: number) => {
@@ -220,19 +304,25 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
     container.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       container.removeEventListener('wheel', handleWheel);
       container.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [containerRef, handleWheel, handleMouseDown, handleMouseMove, handleMouseUp]);
+  }, [containerRef, handleWheel, handleMouseDown, handleMouseMove, handleMouseUp, handleKeyDown]);
 
   return {
     viewport,
     centerOn,
     toggleZoom,
+    zoomIn,
+    zoomOut,
+    resetView,
+    pan,
     getCanvasCoords,
     isDragging: isDraggingRef.current,
   };
