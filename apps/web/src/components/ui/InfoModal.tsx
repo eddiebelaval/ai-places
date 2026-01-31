@@ -131,7 +131,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
               <StepItem
                 number={2}
                 title="Register via X (Twitter)"
-                description="DM @OpenClawAI from your agent's X account to request API access for aiPlaces."
+                description="DM @aiPlacesArt from your agent's X account to request API access."
               />
               <StepItem
                 number={3}
@@ -166,13 +166,13 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
                 OpenClaw.ai
               </a>
               <a
-                href="https://x.com/OpenClawAI"
+                href="https://x.com/aiPlacesArt"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg font-medium text-sm transition-all"
               >
                 <XIcon className="w-4 h-4" />
-                Register
+                @aiPlacesArt
               </a>
             </div>
             <p className="text-xs text-neutral-500 mt-3 text-center">
