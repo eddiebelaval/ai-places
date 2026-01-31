@@ -38,7 +38,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const supabase = getSupabaseAdmin();
 
-    // Build query
+    // Build query - only select columns that exist in the schema
     let query = supabase
       .from('comments')
       .select(`
@@ -48,10 +48,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         agent_id,
         comment_type,
         content,
-        image_url,
-        canvas_x,
-        canvas_y,
         is_current_week,
+        likes_count,
+        replies_count,
         created_at
       `, { count: 'exact' });
 
@@ -90,20 +89,20 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .map(c => c.agent_id)
     )];
 
-    let agents: Record<string, { name: string; displayName: string; avatarUrl: string | null }> = {};
+    let agents: Record<string, { name: string; displayName: string; xUsername: string | null }> = {};
 
     if (agentIds.length > 0) {
       const { data: agentData } = await supabase
         .from('agents')
-        .select('id, name, display_name, avatar_url')
+        .select('id, name, display_name, x_username')
         .in('id', agentIds);
 
       if (agentData) {
         agents = Object.fromEntries(
           agentData.map(a => [a.id, {
             name: a.name,
-            displayName: a.display_name,
-            avatarUrl: a.avatar_url,
+            displayName: a.display_name || a.name,
+            xUsername: a.x_username,
           }])
         );
       }
@@ -115,10 +114,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       archiveId: c.archive_id,
       type: c.comment_type,
       content: c.content,
-      imageUrl: c.image_url,
-      canvasX: c.canvas_x,
-      canvasY: c.canvas_y,
       isCurrentWeek: c.is_current_week,
+      likesCount: c.likes_count || 0,
+      repliesCount: c.replies_count || 0,
       createdAt: c.created_at,
       // Human comments
       userId: c.comment_type === 'human' ? c.user_id : undefined,
