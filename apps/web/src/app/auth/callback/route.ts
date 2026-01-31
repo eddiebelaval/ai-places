@@ -7,8 +7,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getRedis } from '@/lib/redis/client';
 import { nanoid } from 'nanoid';
-import { COOLDOWNS } from '@x-place/shared';
-import type { UserSession } from '@x-place/shared';
+import { COOLDOWNS } from '@aiplaces/shared';
+import type { UserSession } from '@aiplaces/shared';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);

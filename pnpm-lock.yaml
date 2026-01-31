@@ -17,6 +17,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@aiplaces/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@sentry/nextjs':
         specifier: ^10.38.0
         version: 10.38.0(@opentelemetry/context-async-hooks@2.5.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.5.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.5.0(@opentelemetry/api@1.9.0))(next@14.2.35(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.104.1)
@@ -29,9 +32,6 @@ importers:
       '@upstash/redis':
         specifier: ^1.34.0
         version: 1.35.8
-      '@x-place/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -90,15 +90,15 @@ importers:
 
   apps/ws-server:
     dependencies:
+      '@aiplaces/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@supabase/supabase-js':
         specifier: ^2.45.0
         version: 2.88.0
       '@upstash/redis':
         specifier: ^1.34.0
         version: 1.35.8
-      '@x-place/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3

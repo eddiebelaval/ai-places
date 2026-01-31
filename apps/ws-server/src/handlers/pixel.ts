@@ -10,13 +10,13 @@ import {
   LeaderboardService
 } from '../services/redis.js';
 import { send, type UserSession, type ConnectionContext } from './connection.js';
-import { REDIS_KEYS, CANVAS_WIDTH, CANVAS_HEIGHT, COLOR_COUNT } from '@x-place/shared';
+import { REDIS_KEYS, CANVAS_WIDTH, CANVAS_HEIGHT, COLOR_COUNT } from '@aiplaces/shared';
 import type {
   PlacePixelMessage,
   PixelErrorMessage,
   CooldownUpdateMessage,
   PixelPlacedMessage,
-} from '@x-place/shared';
+} from '@aiplaces/shared';
 
 /**
  * Handle pixel placement request

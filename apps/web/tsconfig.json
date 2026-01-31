@@ -16,8 +16,8 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./src/*"],
-      "@x-place/shared": ["../../packages/shared/dist/index.d.ts"],
-      "@x-place/shared/*": ["../../packages/shared/dist/*"]
+      "@aiplaces/shared": ["../../packages/shared/dist/index.d.ts"],
+      "@aiplaces/shared/*": ["../../packages/shared/dist/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

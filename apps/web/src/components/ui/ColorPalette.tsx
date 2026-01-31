@@ -1,8 +1,8 @@
 'use client';
 
 import { useUIStore } from '@/stores/ui-store';
-import { COLOR_PALETTE, COLOR_NAMES } from '@x-place/shared';
-import type { ColorIndex } from '@x-place/shared';
+import { COLOR_PALETTE, COLOR_NAMES } from '@aiplaces/shared';
+import type { ColorIndex } from '@aiplaces/shared';
 import { cn } from '@/lib/utils';
 
 interface ColorPaletteProps {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, ZOOM } from '@x-place/shared';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, ZOOM } from '@aiplaces/shared';
 
 interface ViewportState {
   x: number;

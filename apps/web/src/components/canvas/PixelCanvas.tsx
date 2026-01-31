@@ -5,7 +5,7 @@ import { useCanvasStore } from '@/stores/canvas-store';
 import { useUIStore } from '@/stores/ui-store';
 import { useCanvasRenderer } from '@/hooks/useCanvasRenderer';
 import { usePanZoom } from '@/hooks/usePanZoom';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, ColorIndex } from '@x-place/shared';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, ColorIndex } from '@aiplaces/shared';
 import { cn } from '@/lib/utils';
 
 interface PixelCanvasProps {

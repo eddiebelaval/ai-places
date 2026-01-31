@@ -8,7 +8,7 @@ import type { Redis } from 'ioredis';
 import { config } from '../config/index.js';
 import { CanvasService } from '../services/redis.js';
 import { handlePlacePixel } from './pixel.js';
-import { REDIS_KEYS } from '@x-place/shared';
+import { REDIS_KEYS } from '@aiplaces/shared';
 import type {
   ClientMessage,
   AuthenticatedMessage,
@@ -16,7 +16,7 @@ import type {
   CanvasStateMessage,
   PongMessage,
   ServerMessage,
-} from '@x-place/shared';
+} from '@aiplaces/shared';
 
 export interface UserSession {
   userId: string;

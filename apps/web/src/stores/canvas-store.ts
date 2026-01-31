@@ -8,8 +8,8 @@ import {
   CANVAS_HEIGHT,
   BITS_PER_PIXEL,
   COLOR_RGBA_LOOKUP,
-} from '@x-place/shared';
-import type { ColorIndex, PixelUpdate } from '@x-place/shared';
+} from '@aiplaces/shared';
+import type { ColorIndex, PixelUpdate } from '@aiplaces/shared';
 
 const TOTAL_PIXELS = CANVAS_WIDTH * CANVAS_HEIGHT;
 

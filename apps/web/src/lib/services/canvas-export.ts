@@ -4,8 +4,8 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, BITS_PER_PIXEL } from '@x-place/shared';
-import { COLOR_PALETTE_RGBA } from '@x-place/shared';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, BITS_PER_PIXEL } from '@aiplaces/shared';
+import { COLOR_PALETTE_RGBA } from '@aiplaces/shared';
 
 // Use service role for server-side storage operations
 function getSupabaseAdmin() {

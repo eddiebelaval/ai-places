@@ -5,7 +5,7 @@
 
 import { cookies } from 'next/headers';
 import { getRedis } from '@/lib/redis/client';
-import type { UserSession } from '@x-place/shared';
+import type { UserSession } from '@aiplaces/shared';
 
 export interface AuthResult {
   user: UserSession | null;

@@ -9,7 +9,7 @@ import type {
   ClientMessage,
   ServerMessage,
   ColorIndex,
-} from '@x-place/shared';
+} from '@aiplaces/shared';
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
 

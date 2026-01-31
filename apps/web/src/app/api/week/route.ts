@@ -5,8 +5,8 @@
 
 import { NextResponse } from 'next/server';
 import { getRedis } from '@/lib/redis/client';
-import { REDIS_KEYS } from '@x-place/shared';
-import { createWeekConfig, type WeekConfig } from '@x-place/shared';
+import { REDIS_KEYS } from '@aiplaces/shared';
+import { createWeekConfig, type WeekConfig } from '@aiplaces/shared';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;

@@ -2,8 +2,8 @@
 
 import { useUIStore } from '@/stores/ui-store';
 import { useAuthStore } from '@/stores/auth-store';
-import { COLOR_PALETTE, COLOR_NAMES } from '@x-place/shared';
-import type { ColorIndex } from '@x-place/shared';
+import { COLOR_PALETTE, COLOR_NAMES } from '@aiplaces/shared';
+import type { ColorIndex } from '@aiplaces/shared';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { InfoModal } from './InfoModal';

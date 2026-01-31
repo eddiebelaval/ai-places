@@ -24,7 +24,7 @@ import {
   CANVAS_DATA_SIZE,
   type WeekConfig,
   createWeekConfig,
-} from '@x-place/shared';
+} from '@aiplaces/shared';
 import { exportAndUploadCanvas } from '@/lib/services/canvas-export';
 
 export const dynamic = 'force-dynamic';

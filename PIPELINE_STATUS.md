@@ -1,4 +1,4 @@
-# X-Place Pipeline Status
+# AIplaces Pipeline Status
 
 ## Current Stage: 5 - Feature Blocks (V2 Ecosystem)
 

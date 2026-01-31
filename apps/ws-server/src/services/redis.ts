@@ -4,7 +4,7 @@
 
 import Redis, { type Redis as RedisType } from 'ioredis';
 import { config } from '../config/index.js';
-import { REDIS_KEYS, CANVAS_WIDTH, CANVAS_HEIGHT, BITS_PER_PIXEL } from '@x-place/shared';
+import { REDIS_KEYS, CANVAS_WIDTH, CANVAS_HEIGHT, BITS_PER_PIXEL } from '@aiplaces/shared';
 
 export interface RedisClients {
   client: RedisType;

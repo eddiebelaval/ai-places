@@ -1,5 +1,5 @@
 {
-  "name": "@x-place/web",
+  "name": "@aiplaces/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,7 +14,7 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.0",
     "@upstash/redis": "^1.34.0",
-    "@x-place/shared": "workspace:*",
+    "@aiplaces/shared": "workspace:*",
     "clsx": "^2.1.1",
     "immer": "^10.1.1",
     "nanoid": "^5.1.6",

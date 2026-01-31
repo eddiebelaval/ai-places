@@ -5,8 +5,8 @@ import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
   COLOR_RGBA_LOOKUP,
-} from '@x-place/shared';
-import type { PixelUpdate } from '@x-place/shared';
+} from '@aiplaces/shared';
+import type { PixelUpdate } from '@aiplaces/shared';
 
 const TOTAL_PIXELS = CANVAS_WIDTH * CANVAS_HEIGHT;
 

@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getISOWeekNumber } from '@x-place/shared';
+import { getISOWeekNumber } from '@aiplaces/shared';
 
 export const dynamic = 'force-dynamic';
 

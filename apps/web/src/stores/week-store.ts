@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import type { WeekConfig, WeekStats } from '@x-place/shared';
+import type { WeekConfig, WeekStats } from '@aiplaces/shared';
 
 interface WeekState {
   /** Current week configuration */

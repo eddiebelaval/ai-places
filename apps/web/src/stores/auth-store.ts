@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import type { UserSession, SubscriptionTier } from '@x-place/shared';
+import type { UserSession, SubscriptionTier } from '@aiplaces/shared';
 
 interface PremiumStatus {
   subscriptionTier: SubscriptionTier;
@@ -108,7 +108,7 @@ export const useAuthStore = create<AuthState>()(
         },
       })),
       {
-        name: 'xplace-auth',
+        name: 'aiplaces-auth',
         // Only persist the session token - user data is fetched from server
         partialize: (state) => ({
           sessionToken: state.sessionToken,

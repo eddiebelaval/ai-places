@@ -3,14 +3,14 @@ import { withSentryConfig } from '@sentry/nextjs';
 /** @type {import('next').NextConfig} */
 
 const isDev = process.env.NODE_ENV === 'development';
-const productionOrigins = ['https://xplaces.art', 'https://www.xplaces.art'];
+const productionOrigins = ['https://aiplaces.art', 'https://www.aiplaces.art'];
 const devOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
 const allowedOrigins = isDev ? [...productionOrigins, ...devOrigins] : productionOrigins;
 
 const nextConfig = {
   reactStrictMode: true,
 
-  // Note: @x-place/shared is pre-compiled to ESM in dist/
+  // Note: @aiplaces/shared is pre-compiled to ESM in dist/
   // No transpilePackages needed - resolves from node_modules
 
   // Image optimization

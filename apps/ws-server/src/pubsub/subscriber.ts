@@ -4,7 +4,7 @@
 
 import type { Redis } from 'ioredis';
 import type { WebSocket } from 'ws';
-import { REDIS_KEYS } from '@x-place/shared';
+import { REDIS_KEYS } from '@aiplaces/shared';
 
 /**
  * Set up Redis subscriber for pixel updates

@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
-import { MIN_ACCOUNT_AGE_DAYS } from '@x-place/shared';
+import { MIN_ACCOUNT_AGE_DAYS } from '@aiplaces/shared';
 
 /**
  * Badge shown to users in spectator mode
