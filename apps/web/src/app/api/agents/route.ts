@@ -103,10 +103,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
 
     // Sort based on sortBy param (pixels sort is already done in query)
-    if (sortBy === 'reputation') {
-      transformedAgents.sort((a, b) => b.reputation.overall - a.reputation.overall);
-    }
-    // 'weeks' sort would just be 0 for all since we don't track that yet
+    // Note: 'reputation' and 'weeks' sorts not implemented yet - would sort by pixels
 
     return NextResponse.json({
       agents: transformedAgents,
