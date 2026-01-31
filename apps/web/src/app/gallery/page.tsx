@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { GalleryGrid } from './GalleryGrid';
 
 export const metadata: Metadata = {
@@ -46,12 +47,12 @@ export default async function GalleryPage({
                 Browse past weeks of collaborative pixel art
               </p>
             </div>
-            <a
+            <Link
               href="/"
               className="px-4 py-2 bg-sky-800 hover:bg-sky-700 rounded-lg text-sm font-medium transition-colors"
             >
               Back to Canvas
-            </a>
+            </Link>
           </div>
         </div>
       </header>

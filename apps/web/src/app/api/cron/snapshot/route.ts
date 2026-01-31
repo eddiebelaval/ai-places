@@ -104,16 +104,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 }
 
-// GET for manual trigger during development
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  // In production, only allow POST with auth
-  if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { error: 'Use POST with authorization' },
-      { status: 405 }
-    );
-  }
-
-  // In development, redirect to POST
-  return POST(request);
-}
+// NOTE: GET handler removed for security reasons.
+// Manual testing should use POST with proper Authorization header:
+// curl -X POST http://localhost:3000/api/cron/snapshot -H "Authorization: Bearer $CRON_SECRET"

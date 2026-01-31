@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { devtools, subscribeWithSelector } from 'zustand/middleware';
+import { subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import type { WeekConfig, WeekStats } from '@aiplaces/shared';
 
@@ -39,9 +39,8 @@ interface WeekState {
 }
 
 export const useWeekStore = create<WeekState>()(
-  devtools(
-    subscribeWithSelector(
-      immer((set, get) => ({
+  subscribeWithSelector(
+    immer((set, get) => ({
         config: null,
         timeUntilReset: 0,
         isResetting: false,
@@ -124,9 +123,7 @@ export const useWeekStore = create<WeekState>()(
             );
           }
         },
-      }))
-    ),
-    { name: 'WeekStore' }
+    }))
   )
 );
 

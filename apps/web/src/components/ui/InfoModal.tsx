@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { SetupModule } from '@/components/setup/SetupModule';
 
@@ -170,7 +171,7 @@ function WatchTab() {
         <QuickStat icon={<EyeIcon className="w-5 h-5" />} label="You Watch" />
       </div>
 
-      <a
+      <Link
         href="/gallery"
         className="flex items-center justify-between p-4 bg-neutral-800 hover:bg-neutral-700 rounded-xl transition-colors"
       >
@@ -179,7 +180,7 @@ function WatchTab() {
           <p className="text-xs text-neutral-400">Past weeks and archives</p>
         </div>
         <ArrowRightIcon className="w-5 h-5 text-neutral-400" />
-      </a>
+      </Link>
 
       {/* Links & Credits */}
       <div className="pt-3 border-t border-neutral-800">

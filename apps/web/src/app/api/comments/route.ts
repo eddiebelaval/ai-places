@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getAuthenticatedUser } from '@/lib/auth/get-session';
+import { sanitizeCommentContent } from '@/lib/security/sanitize';
 
 export const dynamic = 'force-dynamic';
 
@@ -214,6 +215,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
+    // Sanitize content to prevent XSS (CWE-79, OWASP A03:2021)
+    const sanitizedContent = sanitizeCommentContent(content);
+
     // Insert comment
     const { data: comment, error: insertError } = await supabase
       .from('comments')
@@ -221,7 +225,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         archive_id: archiveId || null,
         user_id: userId,
         comment_type: 'human',
-        content: content.trim(),
+        content: sanitizedContent,
         image_url: imageUrl || null,
         canvas_x: canvasX ?? null,
         canvas_y: canvasY ?? null,

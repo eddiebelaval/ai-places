@@ -34,9 +34,7 @@ vi.mock('crypto', () => ({
 }));
 
 // Mock Redis client
-const mockExec = vi.fn().mockResolvedValue([0]);
-const mockSetBitfield = vi.fn().mockReturnValue({ exec: mockExec });
-const mockBitfield = vi.fn().mockReturnValue({ set: mockSetBitfield });
+const mockSetbit = vi.fn().mockResolvedValue(0);
 
 const mockRedis = {
   get: vi.fn(),
@@ -45,7 +43,7 @@ const mockRedis = {
   zincrby: vi.fn(),
   incr: vi.fn(),
   sadd: vi.fn(),
-  bitfield: mockBitfield,
+  setbit: mockSetbit,
 };
 
 vi.mock('@/lib/redis/client', () => ({
@@ -93,13 +91,12 @@ function createMockRequest(
 /**
  * Helper to setup a valid agent in Supabase mock
  */
-function setupValidAgent(isActive = true) {
+function setupValidAgent(status: 'active' | 'disabled' = 'active') {
   mockSingle.mockResolvedValue({
     data: {
       id: 'agent-123',
       name: 'test-agent',
-      display_name: 'Test Agent',
-      is_active: isActive,
+      status,
     },
     error: null,
   });
@@ -125,9 +122,7 @@ describe('POST /api/agent/pixel', () => {
     mockRedis.zincrby.mockResolvedValue(1);
     mockRedis.incr.mockResolvedValue(1);
     mockRedis.sadd.mockResolvedValue(1);
-    mockExec.mockResolvedValue([0]);
-    mockSetBitfield.mockReturnValue({ exec: mockExec });
-    mockBitfield.mockReturnValue({ set: mockSetBitfield });
+    mockSetbit.mockResolvedValue(0);
   });
 
   describe('Authentication', () => {
@@ -156,7 +151,7 @@ describe('POST /api/agent/pixel', () => {
     });
 
     it('returns 403 when agent is disabled', async () => {
-      setupValidAgent(false); // is_active = false
+      setupValidAgent('disabled');
       const request = createMockRequest(
         { x: 100, y: 100, color: 5 },
         { 'x-agent-api-key': 'valid-key' }
@@ -447,7 +442,7 @@ describe('POST /api/agent/pixel', () => {
       });
     });
 
-    it('updates canvas via Redis bitfield operation', async () => {
+    it('updates canvas via Redis setbit operations', async () => {
       setupValidAgent();
       mockRedis.get.mockResolvedValue(null);
 
@@ -458,13 +453,14 @@ describe('POST /api/agent/pixel', () => {
 
       await POST(request);
 
-      // Verify bitfield was called with correct key
-      expect(mockBitfield).toHaveBeenCalledWith('xplace:canvas:state');
-
-      // Verify set was called with correct offset calculation
+      // Color 5 = 0101 in binary
       // offset = (y * 500 + x) * 4 = (100 * 500 + 100) * 4 = 200400
-      expect(mockSetBitfield).toHaveBeenCalledWith('u4', 200400, 5);
-      expect(mockExec).toHaveBeenCalled();
+      // setbit is called 4 times for 4 bits (MSB first)
+      expect(mockSetbit).toHaveBeenCalledTimes(4);
+      expect(mockSetbit).toHaveBeenCalledWith('xplace:canvas:state', 200400, 0); // bit3 = 0
+      expect(mockSetbit).toHaveBeenCalledWith('xplace:canvas:state', 200401, 1); // bit2 = 1
+      expect(mockSetbit).toHaveBeenCalledWith('xplace:canvas:state', 200402, 0); // bit1 = 0
+      expect(mockSetbit).toHaveBeenCalledWith('xplace:canvas:state', 200403, 1); // bit0 = 1
     });
 
     it('sets cooldown after successful placement', async () => {

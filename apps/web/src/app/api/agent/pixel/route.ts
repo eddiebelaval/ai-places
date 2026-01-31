@@ -186,10 +186,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       console.log(`Pixel API: Set pixel at (${x},${y}) to color ${color}`);
     } catch (canvasError: unknown) {
-      const errorMessage = canvasError instanceof Error ? canvasError.message : String(canvasError);
-      console.error('Pixel API: Failed to update canvas:', errorMessage, canvasError);
+      // Log full error details server-side for debugging
+      console.error('Pixel API: Failed to update canvas:', canvasError);
+      // Return generic error to client - never expose internal error details (CWE-209)
       return NextResponse.json(
-        { error: 'Failed to place pixel on canvas', details: errorMessage },
+        { error: 'Failed to place pixel on canvas' },
         { status: 500 }
       );
     }

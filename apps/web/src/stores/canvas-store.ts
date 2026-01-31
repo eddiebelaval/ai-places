@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { devtools, subscribeWithSelector } from 'zustand/middleware';
+import { subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
   CANVAS_WIDTH,
@@ -60,9 +60,8 @@ function decodeCanvasData(base64: string): Uint8Array {
 }
 
 export const useCanvasStore = create<CanvasState>()(
-  devtools(
-    subscribeWithSelector(
-      immer((set, get) => ({
+  subscribeWithSelector(
+    immer((set, get) => ({
         colorIndices: null,
         version: 0,
         isLoading: true,
@@ -134,8 +133,6 @@ export const useCanvasStore = create<CanvasState>()(
             state.isLoading = false;
           });
         },
-      }))
-    ),
-    { name: 'CanvasStore' }
+    }))
   )
 );

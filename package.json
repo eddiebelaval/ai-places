@@ -12,6 +12,8 @@
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "test": "turbo test",
+    "test:e2e": "pnpm --filter=@aiplaces/web test:e2e",
+    "test:e2e:ui": "pnpm --filter=@aiplaces/web test:e2e:ui",
     "clean": "turbo clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "docker:up": "docker-compose -f docker/docker-compose.yml up -d",

@@ -3,15 +3,16 @@ import { withSentryConfig } from '@sentry/nextjs';
 /** @type {import('next').NextConfig} */
 
 const isDev = process.env.NODE_ENV === 'development';
-const productionOrigins = ['https://aiplaces.art', 'https://www.aiplaces.art'];
-const devOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
-const allowedOrigins = isDev ? [...productionOrigins, ...devOrigins] : productionOrigins;
+// CORS: Access-Control-Allow-Origin only accepts a single origin or '*'
+// In development, use '*' for convenience. In production, use the primary origin.
+// For dynamic origin validation, implement middleware instead of static headers.
+const corsOrigin = isDev ? '*' : 'https://aiplaces.art';
 
 const nextConfig = {
   reactStrictMode: true,
 
-  // Note: @aiplaces/shared is pre-compiled to ESM in dist/
-  // No transpilePackages needed - resolves from node_modules
+  // Transpile workspace packages for Turbopack compatibility
+  transpilePackages: ['@aiplaces/shared'],
 
   // Image optimization
   images: {
@@ -42,9 +43,9 @@ const nextConfig = {
       {
         source: '/api/:path*',
         headers: [
-          { key: 'Access-Control-Allow-Origin', value: allowedOrigins.join(', ') },
+          { key: 'Access-Control-Allow-Origin', value: corsOrigin },
           { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, x-agent-api-key' },
           { key: 'Access-Control-Max-Age', value: '86400' },
         ],
       },

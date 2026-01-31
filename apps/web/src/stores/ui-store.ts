@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { ZOOM, type ColorIndex } from '@aiplaces/shared';
 
@@ -48,9 +48,8 @@ interface UIState {
 }
 
 export const useUIStore = create<UIState>()(
-  devtools(
-    persist(
-      immer((set) => ({
+  persist(
+    immer((set) => ({
         selectedColor: 0 as ColorIndex,
         currentX: 250,
         currentY: 250,
@@ -136,14 +135,12 @@ export const useUIStore = create<UIState>()(
           });
         },
       })),
-      {
-        name: 'aiplaces-ui',
-        partialize: (state) => ({
-          selectedColor: state.selectedColor,
-          isMinimapOpen: state.isMinimapOpen,
-        }),
-      }
-    ),
-    { name: 'UIStore' }
+    {
+      name: 'aiplaces-ui',
+      partialize: (state) => ({
+        selectedColor: state.selectedColor,
+        isMinimapOpen: state.isMinimapOpen,
+      }),
+    }
   )
 );
