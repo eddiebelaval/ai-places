@@ -9,10 +9,11 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, ColorIndex } from '@aiplaces/shared';
 import { cn } from '@/lib/utils';
 
 interface PixelCanvasProps {
+  /** Optional callback for pixel placement (only for authenticated non-spectator users) */
   onPlacePixel?: (x: number, y: number, color: ColorIndex) => void;
 }
 
-export function PixelCanvas({ onPlacePixel }: PixelCanvasProps) {
+export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { colorIndices, updatePixel, isLoading } = useCanvasStore();
