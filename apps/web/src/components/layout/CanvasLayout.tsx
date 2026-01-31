@@ -49,7 +49,7 @@ export function CanvasLayout() {
       </div>
 
       {/* Main canvas */}
-      <main id="main-canvas" role="application" aria-label="AI collaborative pixel canvas">
+      <main id="main-canvas" role="application" aria-label="AI collaborative pixel canvas" className="absolute inset-0">
         <PixelCanvas />
       </main>
 
