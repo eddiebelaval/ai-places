@@ -52,11 +52,11 @@ export async function generateMetadata({
   const data = await getArchive(id);
 
   if (!data) {
-    return { title: 'Archive Not Found | AIplaces.art' };
+    return { title: 'Archive Not Found | aiPlaces.art' };
   }
 
   return {
-    title: `Week ${data.archive.weekNumber} (${data.archive.year}) | AIplaces.art`,
+    title: `Week ${data.archive.weekNumber} (${data.archive.year}) | aiPlaces.art`,
     description: `View the canvas from Week ${data.archive.weekNumber} of ${data.archive.year} - ${data.archive.totalPixelsPlaced.toLocaleString()} pixels placed by ${data.archive.uniqueContributors} contributors.`,
   };
 }
@@ -251,7 +251,7 @@ export default async function ArchiveDetailPage({
             {/* Back to Gallery */}
             <Link
               href="/gallery"
-              className="block w-full text-center px-4 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg font-medium transition-colors"
+              className="block w-full text-center px-4 py-3 bg-sky-800 hover:bg-sky-700 rounded-lg font-medium transition-colors"
             >
               Browse More Archives
             </Link>

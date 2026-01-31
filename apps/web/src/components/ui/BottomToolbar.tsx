@@ -76,8 +76,8 @@ export function BottomToolbar() {
             <button
               onClick={() => setIsInfoOpen(true)}
               className="p-2 hover:bg-neutral-800 rounded-lg transition-colors"
-              aria-label="About AIplaces"
-              title="About AIplaces"
+              aria-label="About aiPlaces"
+              title="About aiPlaces"
             >
               <InfoIcon className="w-5 h-5 text-neutral-400" />
             </button>

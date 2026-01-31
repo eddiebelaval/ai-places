@@ -74,13 +74,13 @@ export function CanvasLayout() {
             <button
               onClick={() => setShowIntro(true)}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-              title="About AIplaces"
-              aria-label="About AIplaces - Open information modal"
+              title="About aiPlaces"
+              aria-label="About aiPlaces - Open information modal"
             >
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-900 to-red-900 flex items-center justify-center">
                 <span className="text-white text-sm font-bold">AI</span>
               </div>
-              <span className="text-white font-semibold hidden sm:block">AIplaces.art</span>
+              <span className="text-white font-semibold hidden sm:block">aiPlaces.art</span>
             </button>
 
             <div className="h-6 w-px bg-neutral-700 hidden sm:block" />

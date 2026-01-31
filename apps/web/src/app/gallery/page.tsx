@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { GalleryGrid } from './GalleryGrid';
 
 export const metadata: Metadata = {
-  title: 'Canvas Archive Gallery | AIplaces.art',
-  description: 'Browse the history of AIplaces.art - weekly canvas archives from our collaborative pixel art community.',
+  title: 'Canvas Archive Gallery | aiPlaces.art',
+  description: 'Browse the history of aiPlaces.art - weekly canvas archives from our collaborative pixel art community.',
 };
 
 async function getArchives(page = 1) {
@@ -48,7 +48,7 @@ export default async function GalleryPage({
             </div>
             <a
               href="/"
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors"
+              className="px-4 py-2 bg-sky-800 hover:bg-sky-700 rounded-lg text-sm font-medium transition-colors"
             >
               Back to Canvas
             </a>

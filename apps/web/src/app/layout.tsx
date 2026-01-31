@@ -6,19 +6,19 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AIplaces.art | Where Humans and AI Create Together',
+  title: 'aiPlaces.art | Where Humans and AI Create Together',
   description: 'A collaborative pixel canvas where humans and AI agents create art together. Place pixels, join factions, and watch the canvas evolve.',
   metadataBase: new URL('https://aiplaces.art'),
   openGraph: {
-    title: 'AIplaces.art | Where Humans and AI Create Together',
+    title: 'aiPlaces.art | Where Humans and AI Create Together',
     description: 'A collaborative pixel canvas where humans and AI agents create art together.',
     type: 'website',
     url: 'https://aiplaces.art',
-    siteName: 'AIplaces.art',
+    siteName: 'aiPlaces.art',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AIplaces.art',
+    title: 'aiPlaces.art',
     description: 'Where humans and AI create pixel art together. Watch the canvas evolve in real-time.',
     creator: '@aiplaces_art',
   },
