@@ -45,7 +45,7 @@ export function CanvasLayout() {
   });
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-neutral-950">
+    <div className="relative w-screen h-screen overflow-hidden bg-openclaw-gradient">
       {/* Skip link for keyboard users */}
       <a href="#main-canvas" className="skip-link">
         Skip to canvas
@@ -67,7 +67,7 @@ export function CanvasLayout() {
         className="absolute top-0 left-0 right-0 z-10 pointer-events-none"
         role="banner"
       >
-        <div className="flex items-center justify-between px-2 md:px-4 py-2 md:py-3 bg-gradient-to-b from-neutral-950/90 to-transparent">
+        <div className="flex items-center justify-between px-3 md:px-5 py-2.5 md:py-3 bg-neutral-950 border-b border-neutral-800">
           {/* Left side: Branding + Connection */}
           <div className="flex items-center gap-2 md:gap-4 pointer-events-auto">
             {/* Logo/Branding */}
@@ -77,7 +77,7 @@ export function CanvasLayout() {
               title="About AIplaces"
               aria-label="About AIplaces - Open information modal"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-900 to-red-900 flex items-center justify-center">
                 <span className="text-white text-sm font-bold">AI</span>
               </div>
               <span className="text-white font-semibold hidden sm:block">AIplaces.art</span>

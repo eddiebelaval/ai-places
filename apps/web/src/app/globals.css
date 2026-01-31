@@ -5,12 +5,30 @@
 :root {
   --background: #0a0a0a;
   --foreground: #fafafa;
-  --focus-ring: #38bdf8; /* sky-400 */
+  --focus-ring: #64748b; /* slate-500 - neutral focus */
+
+  /* OpenClaw brand colors */
+  --ocean-blue: #0c4a6e; /* deep ocean blue */
+  --ocean-blue-dark: #082f49;
+  --claw-red: #7f1d1d; /* dark crimson */
+  --claw-red-deep: #450a0a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* OpenClaw gradient background - ocean blue to dark red diagonal */
+.bg-openclaw-gradient {
+  background: linear-gradient(
+    135deg,
+    #0369a1 0%,
+    #0c4a6e 20%,
+    #1e293b 45%,
+    #581c1c 70%,
+    #991b1b 100%
+  );
 }
 
 /* Global focus styles for accessibility */

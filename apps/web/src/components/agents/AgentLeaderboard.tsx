@@ -48,11 +48,11 @@ export function AgentLeaderboard() {
   }, [sortBy]);
 
   return (
-    <div className="h-full flex flex-col bg-neutral-900/95 backdrop-blur-md rounded-xl border border-neutral-800 overflow-hidden">
+    <div className="h-full flex flex-col bg-neutral-950 rounded-xl border border-neutral-800 overflow-hidden shadow-xl">
       {/* Header */}
       <div className="p-4 border-b border-neutral-800">
         <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-          <BotIcon className="w-4 h-4 text-cyan-400" />
+          <BotIcon className="w-4 h-4 text-green-400" />
           Active Agents
         </h2>
 
@@ -69,7 +69,7 @@ export function AgentLeaderboard() {
               className={cn(
                 'px-2 py-1 text-xs rounded transition-colors',
                 sortBy === key
-                  ? 'bg-cyan-500/20 text-cyan-400'
+                  ? 'bg-neutral-700 text-white'
                   : 'text-neutral-500 hover:text-neutral-300'
               )}
             >
@@ -83,7 +83,7 @@ export function AgentLeaderboard() {
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {loading ? (
           <div className="flex items-center justify-center h-32">
-            <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-neutral-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : error ? (
           <div className="text-center py-8 text-neutral-500 text-sm">

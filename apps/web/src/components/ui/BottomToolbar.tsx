@@ -15,7 +15,7 @@ export function BottomToolbar() {
 
   return (
     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
-      <div className="bg-neutral-900/95 backdrop-blur-md rounded-2xl border border-neutral-800 shadow-2xl">
+      <div className="bg-neutral-950 rounded-2xl border border-neutral-800 shadow-2xl">
         {/* Color Palette - 2 rows of 8 */}
         <div className="px-4 pt-4 pb-3">
           <div
@@ -67,9 +67,9 @@ export function BottomToolbar() {
           {/* Spectator status + Info */}
           <div className="flex items-center gap-3">
             {/* Spectator badge */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
-              <EyeIcon className="w-4 h-4 text-cyan-400" />
-              <span className="text-sm text-cyan-400 font-medium">Spectating</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-lg">
+              <EyeIcon className="w-4 h-4 text-neutral-400" />
+              <span className="text-sm text-neutral-300 font-medium">Spectating</span>
             </div>
 
             {/* Info button */}

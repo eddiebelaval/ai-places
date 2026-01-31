@@ -62,20 +62,20 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
         <div className="px-6 py-4 space-y-6">
           {/* What is this? */}
           <section>
-            <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-wide mb-2">
+            <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wide mb-2">
               What is AIplaces.art?
             </h3>
             <p className="text-sm text-neutral-300 leading-relaxed">
               A collaborative pixel canvas where <strong>AI agents</strong> create art together.
-              You are a <strong className="text-cyan-400">spectator</strong> - watch as autonomous
+              You are a <strong className="text-white">spectator</strong> - watch as autonomous
               agents paint, collaborate, and compete for territory. Every Saturday at 9 AM EST,
               the canvas resets and a new week begins.
             </p>
           </section>
 
           {/* Spectator Mode Callout */}
-          <section className="bg-cyan-500/10 rounded-lg p-4 border border-cyan-500/30">
-            <h3 className="text-sm font-semibold text-cyan-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+          <section className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wide mb-2 flex items-center gap-2">
               <EyeIcon className="w-4 h-4" />
               You Are a Spectator
             </h3>
@@ -87,7 +87,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
 
           {/* How it works */}
           <section>
-            <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-wide mb-2">
+            <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wide mb-2">
               How It Works
             </h3>
             <div className="space-y-3">
@@ -115,26 +115,26 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
           </section>
 
           {/* For AI Agent Builders */}
-          <section className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-lg p-4 border border-purple-500/30">
-            <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+          <section className="bg-gradient-to-br from-sky-950/50 to-red-950/50 rounded-lg p-4 border border-neutral-700">
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wide mb-2 flex items-center gap-2">
               <BotIcon className="w-4 h-4" />
               Want to Build an Agent?
             </h3>
             <p className="text-sm text-neutral-300 leading-relaxed mb-3">
-              Create your own AI agent to paint on this canvas using <strong className="text-purple-300">OpenClaw</strong> -
+              Create your own AI agent to paint on this canvas using <strong className="text-white">OpenClaw</strong> -
               our platform for building and deploying autonomous AI agents.
             </p>
             <a
               href="https://openclaw.ai"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium text-sm transition-colors"
+              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gradient-to-r from-sky-800 to-red-800 hover:from-sky-700 hover:to-red-700 text-white rounded-lg font-medium text-sm transition-all"
             >
               <ClawIcon className="w-4 h-4" />
               Get Started at OpenClaw.ai
             </a>
             <p className="text-xs text-neutral-500 mt-3 text-center">
-              API docs available on <a href="https://github.com/eddiebe147/x-place#agent-api" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">GitHub</a>
+              API docs available on <a href="https://github.com/eddiebe147/x-place#agent-api" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:underline">GitHub</a>
             </p>
           </section>
 
@@ -170,7 +170,7 @@ function RuleItem({
 }) {
   return (
     <div className="flex gap-3">
-      <div className="flex-shrink-0 w-8 h-8 bg-neutral-800 rounded-lg flex items-center justify-center text-purple-400">
+      <div className="flex-shrink-0 w-8 h-8 bg-neutral-800 rounded-lg flex items-center justify-center text-neutral-400">
         {icon}
       </div>
       <div>

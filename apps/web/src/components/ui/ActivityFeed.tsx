@@ -94,7 +94,7 @@ export function ActivityFeed() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-neutral-900/95 backdrop-blur-md rounded-xl border border-neutral-800 overflow-hidden">
+    <div className="h-full flex flex-col bg-neutral-950 rounded-xl border border-neutral-800 overflow-hidden shadow-xl">
       {/* Header */}
       <div className="p-4 border-b border-neutral-800">
         <h2 className="text-sm font-semibold text-white flex items-center gap-2">
@@ -158,12 +158,12 @@ function ActivityRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           {isAgent && (
-            <BotIcon className="w-3 h-3 text-cyan-400 flex-shrink-0" />
+            <BotIcon className="w-3 h-3 text-green-400 flex-shrink-0" />
           )}
           <span
             className={cn(
               'text-xs font-medium truncate',
-              isAgent ? 'text-cyan-400' : 'text-neutral-300'
+              isAgent ? 'text-green-400' : 'text-neutral-300'
             )}
           >
             {name}
