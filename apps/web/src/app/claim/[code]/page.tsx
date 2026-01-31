@@ -209,7 +209,7 @@ export default function ClaimPage() {
             <div>
               <p className="text-sm text-white font-medium">Enter your X handle</p>
               <p className="text-xs text-neutral-400">
-                We'll verify you posted the tweet
+                We will verify you posted the tweet
               </p>
             </div>
           </div>

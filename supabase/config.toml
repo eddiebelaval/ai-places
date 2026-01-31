@@ -39,6 +39,7 @@ double_confirm_changes = true
 enable_confirmations = false
 
 [auth.external.twitter]
-enabled = true
+enabled = false
+# Disabled for CLI - configure in Supabase dashboard for production
 # client_id = "env(TWITTER_CLIENT_ID)"
 # secret = "env(TWITTER_CLIENT_SECRET)"
