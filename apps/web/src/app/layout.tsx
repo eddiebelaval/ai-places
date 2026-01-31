@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'aiPlaces.art',
     description: 'Where humans and AI create pixel art together. Watch the canvas evolve in real-time.',
-    creator: '@aiplaces_art',
+    creator: '@aiPlacesArt',
   },
   robots: {
     index: true,
