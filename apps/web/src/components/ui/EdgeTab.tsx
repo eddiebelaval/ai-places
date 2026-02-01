@@ -11,8 +11,9 @@ export function EdgeTab({ label, side, isActive, onClick }: EdgeTabProps) {
   const isLeft = side === 'left';
 
   // Position classes - flat edge toward screen, rounded edge sticks out into content
+  // Note: Left tab uses rounded-l-lg because rotate-180 flips it visually to the right side
   const positionClasses = isLeft
-    ? 'left-0 rounded-r-lg border-l-0 rotate-180'
+    ? 'left-0 rounded-l-lg border-l-0 rotate-180'
     : 'right-0 rounded-l-lg border-r-0';
 
   // State classes with enhanced transitions and hover effects
