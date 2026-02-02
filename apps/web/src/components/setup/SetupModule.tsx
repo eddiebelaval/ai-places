@@ -112,7 +112,7 @@ export function SetupModule({ className, claimCode }: SetupModuleProps) {
         return;
       }
 
-      setAgent(data);
+      setAgent(data.agent);
       setStep('verify');
     } catch {
       setError('Registration failed. Please try again.');
