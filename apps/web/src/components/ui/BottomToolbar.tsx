@@ -58,129 +58,77 @@ export function BottomToolbar() {
 
   // Sort by most used for the "hot" indicator
   const sortedByUsage = [...colorActivity].sort((a, b) => b.count - a.count);
-  const topColors = sortedByUsage.slice(0, 3).map((a) => a.color);
+  const trendingColor = sortedByUsage[0];
   const hasActivity = totalPixels > 0;
 
   return (
-    <div className="fixed bottom-2 md:bottom-4 left-2 md:left-1/2 right-2 md:right-auto md:-translate-x-1/2 z-20 pointer-events-auto">
-      <div className="bg-neutral-950/95 backdrop-blur-sm rounded-2xl border border-neutral-800 shadow-2xl">
-        {/* Header - compact on mobile */}
-        <div className="px-3 md:px-4 pt-2 md:pt-3 pb-2 border-b border-neutral-800/50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[10px] md:text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                Color Palette
-              </span>
-            </div>
-            {hasActivity && (
-              <span className="text-[9px] md:text-[10px] text-neutral-500 hidden sm:inline">
-                {totalPixels.toLocaleString()} pixels this session
-              </span>
-            )}
+    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
+      <div className="bg-neutral-950/90 backdrop-blur-md rounded-full border border-neutral-800/50 shadow-2xl px-2 py-1.5 flex items-center gap-2">
+        {/* Trending indicator */}
+        {hasActivity && trendingColor?.count > 0 && (
+          <div className="flex items-center gap-1.5 pl-2 pr-1 border-r border-neutral-700/50">
+            <TrendingIcon className="w-3.5 h-3.5 text-amber-500" />
+            <div
+              className="w-4 h-4 rounded-sm"
+              style={{ backgroundColor: COLOR_PALETTE[trendingColor.color] }}
+            />
+            <span className="text-[11px] text-neutral-400 font-medium pr-2">
+              {COLOR_NAMES[trendingColor.color]}
+            </span>
           </div>
-        </div>
+        )}
 
-        {/* Color Grid - 2 rows of 8, optimized for touch on mobile */}
-        <div className="px-2 md:px-4 py-2 md:py-3">
-          <div className="grid grid-cols-8 gap-1 md:gap-1.5" role="list" aria-label="Available colors">
-            {colorEntries.map(([index, hex]) => {
-              const colorIndex = parseInt(index) as ColorIndex;
-              const activity = colorActivity.find((a) => a.color === colorIndex);
-              const isRecent = recentColor === colorIndex;
-              const isHot = hasActivity && topColors.includes(colorIndex) && (activity?.count || 0) > 0;
+        {/* Color bar - all 16 colors in a row */}
+        <div className="flex items-center gap-0.5" role="list" aria-label="Color palette">
+          {colorEntries.map(([index, hex]) => {
+            const colorIndex = parseInt(index) as ColorIndex;
+            const activity = colorActivity.find((a) => a.color === colorIndex);
+            const isRecent = recentColor === colorIndex;
+            const isTrending = hasActivity && trendingColor?.color === colorIndex && trendingColor.count > 0;
 
-              return (
+            return (
+              <div
+                key={index}
+                className="relative group"
+                role="listitem"
+                aria-label={`${COLOR_NAMES[colorIndex]}${activity?.count ? `: ${activity.count} pixels` : ''}`}
+              >
                 <div
-                  key={index}
-                  className="relative group"
-                  role="listitem"
-                  aria-label={`${COLOR_NAMES[colorIndex]}${activity?.count ? `: ${activity.count} pixels` : ''}`}
-                >
-                  {/* Color square - larger touch target on mobile */}
+                  className={`
+                    w-5 h-5 rounded-sm transition-all duration-200
+                    ${isRecent ? 'scale-125 ring-2 ring-white shadow-lg z-10' : 'hover:scale-110'}
+                    ${isTrending && !isRecent ? 'ring-1 ring-amber-500/60' : ''}
+                  `}
+                  style={{ backgroundColor: hex }}
+                />
+
+                {/* Activity pulse */}
+                {isRecent && (
                   <div
-                    className={`
-                      w-9 h-9 md:w-8 md:h-8 rounded-lg transition-all duration-300
-                      ${isRecent ? 'scale-110 md:scale-125 ring-2 ring-white shadow-lg z-10' : ''}
-                      ${isHot && !isRecent ? 'ring-1 ring-amber-500/50' : ''}
-                    `}
-                    style={{ backgroundColor: hex }}
+                    className="absolute inset-0 rounded-sm animate-ping"
+                    style={{ backgroundColor: hex, opacity: 0.5 }}
                   />
+                )}
 
-                  {/* Activity pulse for recent */}
-                  {isRecent && (
-                    <div
-                      className="absolute inset-0 rounded-lg animate-ping"
-                      style={{ backgroundColor: hex, opacity: 0.4 }}
-                    />
-                  )}
+                {/* Count badge for active colors */}
+                {hasActivity && (activity?.count || 0) > 0 && (
+                  <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white/60" />
+                )}
 
-                  {/* Hot indicator - only if actually has activity */}
-                  {isHot && topColors.indexOf(colorIndex) === 0 && (activity?.count || 0) > 0 && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-500 flex items-center justify-center">
-                      <span className="text-[8px] font-bold text-black">1</span>
-                    </div>
-                  )}
-
-                  {/* Tooltip on hover - desktop only */}
-                  <div className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-800 rounded text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
-                    <div className="font-medium">{COLOR_NAMES[colorIndex]}</div>
-                    {hasActivity && activity?.count ? (
-                      <div className="text-neutral-400">{activity.count} placed</div>
-                    ) : null}
-                  </div>
+                {/* Tooltip */}
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-800 rounded text-[10px] text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
+                  {COLOR_NAMES[colorIndex]}
+                  {activity?.count ? ` (${activity.count})` : ''}
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Divider */}
-        <div className="h-px bg-neutral-800 mx-3 md:mx-4" />
-
-        {/* Bottom row: Status + Info - responsive layout */}
-        <div className="px-3 md:px-4 py-2 md:py-3 flex items-center justify-between gap-2 md:gap-4">
-          {/* Trending color or placeholder - hidden on small mobile */}
-          <div className="hidden sm:flex items-center gap-2 flex-1 min-w-0">
-            {hasActivity && sortedByUsage[0]?.count > 0 ? (
-              <>
-                <TrendingIcon className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                <span className="text-xs text-neutral-500 hidden md:inline">Trending:</span>
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <div
-                    className="w-4 h-4 rounded flex-shrink-0"
-                    style={{ backgroundColor: COLOR_PALETTE[sortedByUsage[0].color] }}
-                  />
-                  <span className="text-sm text-neutral-300 truncate">
-                    {COLOR_NAMES[sortedByUsage[0].color]}
-                  </span>
-                </div>
-              </>
-            ) : (
-              <span className="text-xs text-neutral-500 truncate">
-                Watch agents paint
-              </span>
-            )}
-          </div>
-
-          {/* Spectator status + Info */}
-          <div className="flex items-center gap-2 md:gap-3">
-            {/* Spectator badge - compact on mobile */}
-            <div className="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 bg-neutral-800/80 border border-neutral-700/50 rounded-lg">
-              <EyeIcon className="w-3.5 h-3.5 md:w-4 md:h-4 text-neutral-400" />
-              <span className="text-xs md:text-sm text-neutral-300 font-medium">Spectating</span>
-            </div>
-
-            {/* Info button - larger touch target */}
-            <button
-              onClick={() => setIsInfoOpen(true)}
-              className="p-2 md:p-2 hover:bg-neutral-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-              aria-label="About aiPlaces"
-              title="About aiPlaces"
-            >
-              <InfoIcon className="w-5 h-5 text-neutral-400" />
-            </button>
-          </div>
+        {/* Spectator badge */}
+        <div className="flex items-center gap-1.5 pl-1 pr-2 border-l border-neutral-700/50">
+          <EyeIcon className="w-3.5 h-3.5 text-neutral-500" />
+          <span className="text-[11px] text-neutral-400 font-medium">Spectating</span>
         </div>
       </div>
 
