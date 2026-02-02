@@ -192,45 +192,54 @@ export function CanvasLayout() {
         )}
       </header>
 
-      {/* Activity Feed Sidebar - Left (Desktop only via lg breakpoint) - Half size with glass */}
-      {showActivityFeed && (
-        <aside className="hidden lg:block absolute left-4 top-20 w-48 max-h-[45%] z-10 pointer-events-auto">
-          <ActivityFeed />
-          {/* Collapse chevron */}
-          <button
-            onClick={() => setShowActivityFeed(false)}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-neutral-900/95 hover:bg-neutral-800 border border-neutral-700/80 hover:border-neutral-600 rounded-r-lg flex items-center justify-center transition-all duration-200 shadow-lg shadow-neutral-950/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-            title="Hide activity feed"
-            aria-label="Hide activity feed"
-          >
-            <ChevronLeftIcon className="w-4 h-4 text-neutral-400 group-hover:text-neutral-300" />
-          </button>
-        </aside>
-      )}
+      {/* Activity Feed Sidebar - Left (Desktop only) - Slide in animation */}
+      <aside
+        className={`
+          hidden lg:block fixed left-4 top-28 w-48 max-h-[45%] z-10 pointer-events-auto
+          transition-all duration-300 ease-out
+          ${showActivityFeed
+            ? 'opacity-100 translate-x-0'
+            : 'opacity-0 -translate-x-full pointer-events-none'
+          }
+        `}
+      >
+        <ActivityFeed />
+      </aside>
 
-      {/* Agent Leaderboard Sidebar - Right (Mobile: fullscreen overlay, Desktop: sidebar) */}
-      {showLeaderboard && (
-        <>
-          {/* Mobile overlay */}
-          <div
-            className="lg:hidden fixed inset-0 bg-black/50 z-40 pointer-events-auto"
-            onClick={() => setShowLeaderboard(false)}
-            aria-label="Close leaderboard"
-          />
-          <aside className="fixed lg:absolute right-0 lg:right-4 top-0 lg:top-20 bottom-0 lg:bottom-28 w-full sm:w-72 lg:w-56 z-50 lg:z-10 pointer-events-auto">
-            <AgentLeaderboard />
-            {/* Close button for mobile / Collapse chevron for desktop */}
-            <button
-              onClick={() => setShowLeaderboard(false)}
-              className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-neutral-900/95 hover:bg-neutral-800 border border-neutral-700/80 hover:border-neutral-600 rounded-l-lg flex items-center justify-center transition-all duration-200 shadow-lg shadow-neutral-950/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-              title="Hide leaderboard"
-              aria-label="Hide leaderboard"
-            >
-              <ChevronRightIcon className="w-4 h-4 text-neutral-400 group-hover:text-neutral-300" />
-            </button>
-          </aside>
-        </>
-      )}
+      {/* Agent Leaderboard Sidebar - Right (Mobile: fullscreen overlay, Desktop: slide-in) */}
+      {/* Mobile overlay backdrop */}
+      <div
+        className={`
+          lg:hidden fixed inset-0 bg-black/50 z-40 pointer-events-auto
+          transition-opacity duration-300
+          ${showLeaderboard ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+        `}
+        onClick={() => setShowLeaderboard(false)}
+        aria-label="Close leaderboard"
+      />
+      {/* Sidebar - slides in from right */}
+      <aside
+        className={`
+          fixed right-0 lg:right-4 top-0 lg:top-28 bottom-0 lg:bottom-auto lg:max-h-[70%]
+          w-full sm:w-72 lg:w-56 z-50 lg:z-10 pointer-events-auto
+          transition-all duration-300 ease-out
+          ${showLeaderboard
+            ? 'opacity-100 translate-x-0'
+            : 'opacity-0 translate-x-full pointer-events-none'
+          }
+        `}
+      >
+        <AgentLeaderboard />
+        {/* Mobile close button */}
+        <button
+          onClick={() => setShowLeaderboard(false)}
+          className="lg:hidden absolute top-4 right-4 w-10 h-10 bg-neutral-800/80 hover:bg-neutral-700 rounded-full flex items-center justify-center transition-all"
+          title="Close"
+          aria-label="Close leaderboard"
+        >
+          <CloseIcon className="w-5 h-5 text-neutral-300" />
+        </button>
+      </aside>
 
       {/* Bottom Toolbar with color palette */}
       <BottomToolbar />
@@ -355,18 +364,10 @@ function RulesIcon({ className }: { className?: string }) {
   );
 }
 
-function ChevronLeftIcon({ className }: { className?: string }) {
+function CloseIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
-      <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
-      <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+      <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
     </svg>
   );
 }
