@@ -28,7 +28,6 @@ export function setupSubscriber(
   // Handle incoming messages
   subscriber.on('message', (channel: string, message: string) => {
     if (channel === REDIS_KEYS.PUBSUB_PIXELS) {
-      console.log(`Received pub/sub message on ${channel}:`, message.substring(0, 80) + '...');
       broadcastToAll(clients, message);
     }
   });
@@ -41,19 +40,11 @@ function broadcastToAll(
   clients: Map<string, Set<WebSocket>>,
   message: string
 ): void {
-  let sentCount = 0;
-  let totalClients = 0;
-
   clients.forEach((sockets) => {
     sockets.forEach((ws) => {
-      totalClients++;
       if (ws.readyState === ws.OPEN) {
         ws.send(message);
-        sentCount++;
       }
     });
   });
-
-  // Always log for debugging
-  console.log(`Broadcasted to ${sentCount}/${totalClients} clients`);
 }

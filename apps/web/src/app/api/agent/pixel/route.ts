@@ -262,8 +262,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           isAgent: true,
         },
       };
-      const pubResult = await redis.publish(REDIS_KEYS.PUBSUB_PIXELS, JSON.stringify(pixelUpdate));
-      console.log(`Pixel API: Published to ${pubResult} subscriber(s)`);
+      await redis.publish(REDIS_KEYS.PUBSUB_PIXELS, JSON.stringify(pixelUpdate));
     } catch (broadcastError) {
       console.warn('Pixel API: Failed to broadcast update:', broadcastError);
       // Continue - pixel was placed successfully
