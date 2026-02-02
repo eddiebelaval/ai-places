@@ -134,7 +134,7 @@ export function CanvasLayout() {
             aria-label="Primary"
           >
             <div className="flex items-center gap-2 rounded-xl bg-neutral-900/40 border border-white/10 px-2 py-1.5 shadow-lg shadow-neutral-950/50 backdrop-blur-xl">
-              <NavTab label="Gallery" onClick={() => setActiveOverlay('gallery')} />
+              <NavTab label="What's This?" onClick={() => setShowIntro(true)} />
               <NavTab label="Setup" onClick={() => setActiveOverlay('setup')} />
               <NavTab label="Games" onClick={() => setActiveOverlay('games')} />
             </div>
@@ -164,7 +164,11 @@ export function CanvasLayout() {
         {showMobileNav && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-neutral-900/60 border-b border-white/10 pointer-events-auto backdrop-blur-xl shadow-lg shadow-neutral-950/50">
             <nav className="p-3 space-y-2" aria-label="Mobile navigation">
-              <MobileNavButton label="Gallery" onClick={() => { setActiveOverlay('gallery'); setShowMobileNav(false); }} />
+              <MobileNavButton
+                label="What's This?"
+                onClick={() => { setShowIntro(true); setShowMobileNav(false); }}
+                icon={<InfoIcon className="w-5 h-5 text-amber-400" />}
+              />
               <MobileNavButton label="Setup" onClick={() => { setActiveOverlay('setup'); setShowMobileNav(false); }} />
               <MobileNavButton label="Games" onClick={() => { setActiveOverlay('games'); setShowMobileNav(false); }} />
               <MobileNavButton
@@ -384,6 +388,14 @@ function GitHubIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
       <path fillRule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V19c0 .27.16.59.67.5C17.14 18.16 20 14.42 20 10A10 10 0 0010 0z" clipRule="evenodd" />
+    </svg>
+  );
+}
+
+function InfoIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
     </svg>
   );
 }
