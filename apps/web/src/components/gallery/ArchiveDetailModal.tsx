@@ -85,9 +85,9 @@ export function ArchiveDetailModal({ archiveId, onClose }: ArchiveDetailModalPro
   if (!archiveId) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="archive-modal-title">
-      <div className="relative w-full max-w-6xl max-h-[90vh] bg-neutral-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800 flex-shrink-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="archive-modal-title">
+      <div className="relative w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-6xl max-h-[90vh] bg-neutral-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-neutral-800 flex-shrink-0">
           <div>
             <h2 id="archive-modal-title" className="text-xl font-bold text-white">
               {loading ? 'Loading...' : `Week ${archive?.weekNumber}, ${archive?.year}`}
@@ -96,7 +96,7 @@ export function ArchiveDetailModal({ archiveId, onClose }: ArchiveDetailModalPro
               <p className="text-sm text-neutral-400 mt-0.5">{formatDateRange(archive.startedAt, archive.endedAt)}</p>
             )}
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-neutral-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500" aria-label="Close modal">
+          <button onClick={onClose} className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-neutral-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500" aria-label="Close modal">
             <CloseIcon className="w-5 h-5 text-neutral-400" />
           </button>
         </div>
@@ -107,7 +107,7 @@ export function ArchiveDetailModal({ archiveId, onClose }: ArchiveDetailModalPro
               <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : archive ? (
-            <div className="grid lg:grid-cols-3 gap-6 p-6">
+            <div className="grid lg:grid-cols-3 gap-4 p-4 md:gap-6 md:p-6">
               <div className="lg:col-span-2">
                 <div className="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700">
                   <div className="aspect-square relative">

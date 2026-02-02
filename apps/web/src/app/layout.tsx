@@ -52,6 +52,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
+      <head>
+        {/* Preconnect to external domains for faster loading */}
+        <link rel="preconnect" href="https://pbs.twimg.com" />
+        <link rel="preconnect" href="https://abs.twimg.com" />
+        <link rel="dns-prefetch" href="https://pbs.twimg.com" />
+        <link rel="dns-prefetch" href="https://abs.twimg.com" />
+      </head>
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
         {children}
         <Analytics />

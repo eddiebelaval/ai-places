@@ -154,6 +154,132 @@ apps/web/src/app/layout.tsx
 
 1. Test on actual mobile devices (iPhone 14, Android)
 2. Add E2E tests for mobile interactions
-3. Consider PWA optimizations (manifest, service worker)
-4. Add touch gesture support for canvas pan/zoom
+3. ~~Consider PWA optimizations (manifest, service worker)~~ DONE
+4. ~~Add touch gesture support for canvas pan/zoom~~ DONE
 5. Monitor Core Web Vitals on mobile
+
+---
+
+## February 2026 Update: Phase 2 Mobile Optimization
+
+### 7. Canvas Touch Gestures (Critical)
+
+**Problem**: Canvas only supported mouse/keyboard - completely broken on mobile.
+
+**File:** `apps/web/src/hooks/usePanZoom.ts`
+
+**Solution**:
+- **Single-finger pan**: Drag to move around the canvas
+- **Two-finger pinch zoom**: Zoom centered on the midpoint between fingers
+- **Tap-to-place**: Short taps (< 300ms, < 5px movement) dispatch `canvasTap` custom event
+- **Touch state tracking**: `isTouching` exposed in return object for UI feedback
+
+**Implementation Details**:
+- Added refs: `touchStartRef`, `lastTouchRef`, `isTouchingRef`, `initialPinchDistRef`, `initialZoomRef`, `touchMovedRef`
+- `getPinchDistance()` uses `Math.hypot()` for accurate distance calculation
+- All touch listeners use `{ passive: false }` to allow `preventDefault()`
+- Seamless transition between 1 and 2 finger gestures
+- `touchcancel` handled same as `touchend` for robustness
+
+### 8. Gallery Responsiveness
+
+**Files Modified:**
+- `apps/web/src/components/gallery/ArchiveDetailModal.tsx`
+- `apps/web/src/components/gallery/EnhancedGalleryGrid.tsx`
+- `apps/web/src/components/gallery/ArchiveCard.tsx`
+
+**Changes**:
+- Modal width: `w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-6xl`
+- Modal padding: `gap-4 p-4 md:gap-6 md:p-6`
+- Header padding: `px-4 py-3 md:px-6 md:py-4`
+- Close button: `min-w-[44px] min-h-[44px]` touch target
+- Grid gap: `gap-3 md:gap-4`
+- Pagination: Icon-only on mobile (`<ChevronLeftIcon>`, `<ChevronRightIcon>`)
+- Pagination buttons: `min-w-[44px] min-h-[44px]` touch targets
+- Card objective badges: `text-xs` (up from `text-[10px]`), `max-w-[100px]` (up from `80px`)
+
+### 9. PWA Implementation
+
+**Files Modified:**
+- `apps/web/next.config.mjs` - Wrapped with `next-pwa`
+- `apps/web/public/manifest.json` - Added `orientation`, `maskable` icons, `categories`
+- `apps/web/src/app/offline/page.tsx` - Created offline fallback page
+- `.gitignore` - Added `sw.js`, `workbox-*.js`
+
+**Caching Strategy:**
+
+| Resource Type | Strategy | Cache Name | Max Age |
+|--------------|----------|------------|---------|
+| Images (png/jpg/webp/svg/gif) | CacheFirst | images-cache | 30 days |
+| Fonts (woff/woff2/ttf/otf) | CacheFirst | fonts-cache | 1 year |
+| API requests | NetworkFirst | api-cache | 1 hour fallback |
+| JS/CSS | StaleWhileRevalidate | static-cache | 7 days |
+
+**Manifest Updates:**
+- `orientation: portrait` - Lock to portrait on mobile
+- `purpose: any maskable` on icons - Better adaptive icon support
+- `categories: ["art", "social", "entertainment"]`
+- `prefer_related_applications: false`
+
+### 10. Performance Hints
+
+**File:** `apps/web/src/app/layout.tsx`
+
+Added preconnect hints for faster third-party loading:
+```html
+<link rel="preconnect" href="https://pbs.twimg.com" />
+<link rel="preconnect" href="https://abs.twimg.com" />
+<link rel="dns-prefetch" href="https://pbs.twimg.com" />
+<link rel="dns-prefetch" href="https://abs.twimg.com" />
+```
+
+---
+
+## Updated Testing Checklist
+
+### Touch Gestures
+- [ ] Single-finger drag pans canvas smoothly
+- [ ] Two-finger pinch zooms centered on fingers
+- [ ] Short tap dispatches canvasTap event for pixel placement
+- [ ] Transitioning from 2 fingers to 1 continues pan smoothly
+- [ ] No browser default gestures interfere (scroll, pinch-zoom page)
+- [ ] iOS Safari 16+ works
+- [ ] Chrome Android 110+ works
+
+### Gallery
+- [x] Modal fills 95% width on 375px viewport
+- [x] All touch targets 44x44px minimum
+- [x] No horizontal overflow at any breakpoint
+- [x] Pagination usable with thumb
+- [x] Objective badges readable on mobile
+
+### PWA
+- [x] `pnpm build` generates service worker (`/public/sw.js`)
+- [ ] Lighthouse PWA score 100
+- [ ] App installable on iOS (Add to Home Screen)
+- [ ] App installable on Android (Install App prompt)
+- [ ] Offline page displays when disconnected
+- [ ] Cached images load offline
+- [ ] API requests fallback gracefully
+
+---
+
+## Browser Support Matrix
+
+| Browser | Min Version | Status | Notes |
+|---------|------------|--------|-------|
+| Safari iOS | 16+ | Primary | PWA install via Add to Home Screen |
+| Chrome Android | 110+ | Primary | Full PWA support |
+| Firefox Mobile | Latest | Secondary | Limited PWA support |
+| Samsung Internet | Latest | Secondary | Good PWA support |
+
+---
+
+## Future Improvements
+
+1. **Virtual scrolling** for gallery with 100+ archives
+2. **Haptic feedback** on pixel placement (Vibration API)
+3. **Offline pixel queue** - place pixels offline, sync when reconnected
+4. **Touch gesture customization** - sensitivity settings
+5. **Landscape mode optimization** for tablets
+6. **Background sync** for offline actions (PWA)

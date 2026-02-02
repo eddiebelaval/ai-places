@@ -61,9 +61,9 @@ export function ArchiveCard({ archive, className = '' }: ArchiveCardProps): Reac
         {objectives.length > 0 && (
           <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             {objectives.slice(0, 2).map((objective) => (
-              <div key={objective.id} className="bg-purple-900/90 backdrop-blur-sm px-2 py-1 rounded-md border border-purple-700/50 flex items-center gap-1" title={objective.name}>
-                {objective.icon && <span className="text-xs">{getIconForObjective(objective.icon)}</span>}
-                <span className="text-[10px] font-medium text-purple-200 truncate max-w-[80px]">{objective.name}</span>
+              <div key={objective.id} className="bg-purple-900/90 backdrop-blur-sm px-2 py-1.5 rounded-md border border-purple-700/50 flex items-center gap-1.5" title={objective.name}>
+                {objective.icon && <span className="text-sm">{getIconForObjective(objective.icon)}</span>}
+                <span className="text-xs font-medium text-purple-200 truncate max-w-[100px]">{objective.name}</span>
               </div>
             ))}
           </div>

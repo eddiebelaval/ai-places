@@ -118,7 +118,7 @@ export function EnhancedGalleryGrid({ archives, pagination }: EnhancedGalleryGri
       {processedArchives.length === 0 ? (
         <EmptyState filterActive={filterBy !== 'all'} />
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {processedArchives.map((archive) => (
             <div
               key={archive.id}
@@ -184,17 +184,19 @@ function EmptyState({ filterActive }: { filterActive: boolean }) {
 
 function Pagination({ pagination }: { pagination: Pagination }) {
   return (
-    <div className="flex items-center justify-center gap-2 mt-8">
+    <div className="flex items-center justify-center gap-1 sm:gap-2 mt-6 sm:mt-8">
       <a
         href={`?page=${pagination.page - 1}`}
-        className={`px-4 py-2 rounded-lg bg-neutral-800 text-sm font-medium transition-colors ${
+        className={`px-3 py-2 sm:px-4 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-neutral-800 text-sm font-medium transition-colors ${
           pagination.page <= 1
             ? 'opacity-50 pointer-events-none cursor-not-allowed'
             : 'hover:bg-neutral-700'
         }`}
         aria-disabled={pagination.page <= 1}
+        aria-label="Previous page"
       >
-        Previous
+        <ChevronLeftIcon className="w-5 h-5 sm:hidden" />
+        <span className="hidden sm:inline">Previous</span>
       </a>
 
       <div className="flex items-center gap-1">
@@ -204,14 +206,16 @@ function Pagination({ pagination }: { pagination: Pagination }) {
 
       <a
         href={`?page=${pagination.page + 1}`}
-        className={`px-4 py-2 rounded-lg bg-neutral-800 text-sm font-medium transition-colors ${
+        className={`px-3 py-2 sm:px-4 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-neutral-800 text-sm font-medium transition-colors ${
           pagination.page >= pagination.totalPages
             ? 'opacity-50 pointer-events-none cursor-not-allowed'
             : 'hover:bg-neutral-700'
         }`}
         aria-disabled={pagination.page >= pagination.totalPages}
+        aria-label="Next page"
       >
-        Next
+        <ChevronRightIcon className="w-5 h-5 sm:hidden" />
+        <span className="hidden sm:inline">Next</span>
       </a>
     </div>
   );
@@ -273,5 +277,21 @@ function Ellipsis() {
     <span className="px-2 py-2 text-neutral-500 text-sm">
       ...
     </span>
+  );
+}
+
+function ChevronLeftIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
+    </svg>
+  );
+}
+
+function ChevronRightIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+    </svg>
   );
 }
