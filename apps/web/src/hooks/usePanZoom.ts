@@ -41,6 +41,9 @@ function screenToCanvas(
 
 /**
  * Hook for pan and zoom navigation
+ *
+ * IMPORTANT: Uses refs for values accessed in event handlers to avoid
+ * stale closure issues that break touch gestures.
  */
 export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptions) {
   const [viewport, setViewport] = useState<ViewportState>({
@@ -51,6 +54,20 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
     targetY: 0,
     targetZoom: ZOOM.DEFAULT,
   });
+
+  // Refs for values that change frequently but are needed in event handlers
+  // This prevents stale closures and avoids re-registering event listeners
+  const viewportRef = useRef(viewport);
+  const onCoordinateChangeRef = useRef(onCoordinateChange);
+
+  // Keep refs in sync with state/props
+  useEffect(() => {
+    viewportRef.current = viewport;
+  }, [viewport]);
+
+  useEffect(() => {
+    onCoordinateChangeRef.current = onCoordinateChange;
+  }, [onCoordinateChange]);
 
   const isDraggingRef = useRef(false);
   const lastPosRef = useRef({ x: 0, y: 0 });
@@ -94,7 +111,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
     };
   }, []);
 
-  // Mouse wheel zoom
+  // Mouse wheel zoom - stable reference, uses viewportRef
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       e.preventDefault();
@@ -144,16 +161,16 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
 
       const rect = container.getBoundingClientRect();
 
-      // Update coordinate display
-      if (onCoordinateChange) {
+      // Update coordinate display using ref
+      if (onCoordinateChangeRef.current) {
         const coords = screenToCanvas(
           e.clientX - rect.left,
           e.clientY - rect.top,
-          viewport,
+          viewportRef.current,
           rect.width,
           rect.height
         );
-        onCoordinateChange(coords.x, coords.y);
+        onCoordinateChangeRef.current(coords.x, coords.y);
       }
 
       if (!isDraggingRef.current) return;
@@ -170,7 +187,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
         targetY: prev.targetY + dy,
       }));
     },
-    [viewport, containerRef, onCoordinateChange]
+    [containerRef]
   );
 
   const handleMouseUp = useCallback(() => {
@@ -193,7 +210,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
     };
   };
 
-  // Touch start handler
+  // Touch start handler - stable reference, uses refs
   const handleTouchStart = useCallback(
     (e: TouchEvent) => {
       const container = containerRef.current;
@@ -221,7 +238,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       } else if (touches.length === 2) {
         // Two fingers - prepare for pinch zoom
         initialPinchDistRef.current = getPinchDistance(touches);
-        initialZoomRef.current = viewport.targetZoom;
+        initialZoomRef.current = viewportRef.current.targetZoom;
 
         // Store midpoint for pan during pinch
         const rect = container.getBoundingClientRect();
@@ -229,10 +246,10 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
         lastTouchRef.current = { x: mid.x + rect.left, y: mid.y + rect.top };
       }
     },
-    [containerRef, viewport.targetZoom]
+    [containerRef]
   );
 
-  // Touch move handler
+  // Touch move handler - stable reference, uses refs
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
       const container = containerRef.current;
@@ -264,16 +281,16 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
           targetY: prev.targetY + dy,
         }));
 
-        // Update coordinate display
-        if (onCoordinateChange) {
+        // Update coordinate display using ref
+        if (onCoordinateChangeRef.current) {
           const coords = screenToCanvas(
             touch.clientX - rect.left,
             touch.clientY - rect.top,
-            viewport,
+            viewportRef.current,
             rect.width,
             rect.height
           );
-          onCoordinateChange(coords.x, coords.y);
+          onCoordinateChangeRef.current(coords.x, coords.y);
         }
       } else if (touches.length === 2 && initialPinchDistRef.current > 0) {
         // Two finger pinch zoom
@@ -303,10 +320,10 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
         });
       }
     },
-    [containerRef, viewport, onCoordinateChange]
+    [containerRef]
   );
 
-  // Touch end handler
+  // Touch end handler - stable reference, uses refs
   const handleTouchEnd = useCallback(
     (e: TouchEvent) => {
       const container = containerRef.current;
@@ -325,16 +342,16 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
           const touch = e.changedTouches[0];
           const rect = container.getBoundingClientRect();
 
-          // Update coordinate display for tap location
-          if (onCoordinateChange) {
+          // Update coordinate display for tap location using ref
+          if (onCoordinateChangeRef.current) {
             const coords = screenToCanvas(
               touch.clientX - rect.left,
               touch.clientY - rect.top,
-              viewport,
+              viewportRef.current,
               rect.width,
               rect.height
             );
-            onCoordinateChange(coords.x, coords.y);
+            onCoordinateChangeRef.current(coords.x, coords.y);
           }
 
           // Dispatch a custom tap event that the canvas can listen for
@@ -362,7 +379,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
         initialPinchDistRef.current = 0;
       }
     },
-    [containerRef, viewport, onCoordinateChange]
+    [containerRef]
   );
 
   // Center on coordinates
@@ -483,15 +500,15 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       return screenToCanvas(
         screenX - rect.left,
         screenY - rect.top,
-        viewport,
+        viewportRef.current,
         rect.width,
         rect.height
       );
     },
-    [viewport, containerRef]
+    [containerRef]
   );
 
-  // Set up event listeners
+  // Set up event listeners - now with stable handler references
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
