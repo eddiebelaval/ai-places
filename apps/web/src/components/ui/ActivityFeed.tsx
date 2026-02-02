@@ -69,9 +69,9 @@ export function ActivityFeed() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-neutral-950 rounded-xl border border-neutral-800 overflow-hidden shadow-xl">
+    <div className="h-full flex flex-col bg-neutral-900/40 backdrop-blur-xl rounded-xl border border-white/10 overflow-hidden shadow-xl">
       {/* Header */}
-      <div className="p-4 border-b border-neutral-800">
+      <div className="p-3 border-b border-white/10">
         <h2 className="text-sm font-semibold text-white flex items-center gap-2">
           <ActivityPulse />
           Live Activity
@@ -101,7 +101,7 @@ export function ActivityFeed() {
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-neutral-800 text-center">
+      <div className="p-2 border-t border-white/10 text-center">
         <p className="text-xs text-neutral-600">
           {activities.length > 0 ? `${activities.length} recent events` : 'No recent activity'}
         </p>

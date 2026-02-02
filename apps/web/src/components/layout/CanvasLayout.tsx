@@ -92,7 +92,7 @@ export function CanvasLayout() {
         className="absolute top-0 left-0 right-0 z-10 pointer-events-none"
         role="banner"
       >
-        <div className="flex items-center justify-between px-3 md:px-5 py-2.5 md:py-3 bg-neutral-950/95 border-b border-neutral-800/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-3 md:px-5 py-2.5 md:py-3 bg-neutral-900/40 border-b border-white/10 backdrop-blur-xl">
           {/* Left side: Branding + Connection */}
           <div className="flex items-center gap-2 md:gap-4 pointer-events-auto">
             {/* Logo/Branding - Lobster artist mascot */}
@@ -133,7 +133,7 @@ export function CanvasLayout() {
             className="pointer-events-auto hidden md:flex flex-1 items-center justify-center px-2"
             aria-label="Primary"
           >
-            <div className="flex items-center gap-2 rounded-xl bg-neutral-900/80 border border-neutral-800/80 px-2 py-1.5 shadow-lg shadow-neutral-950/50 backdrop-blur-sm">
+            <div className="flex items-center gap-2 rounded-xl bg-neutral-900/40 border border-white/10 px-2 py-1.5 shadow-lg shadow-neutral-950/50 backdrop-blur-xl">
               <NavTab label="Gallery" onClick={() => setActiveOverlay('gallery')} />
               <NavTab label="Setup" onClick={() => setActiveOverlay('setup')} />
               <NavTab label="Games" onClick={() => setActiveOverlay('games')} />
@@ -162,7 +162,7 @@ export function CanvasLayout() {
 
         {/* Mobile dropdown menu */}
         {showMobileNav && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-neutral-950/98 border-b border-neutral-800/80 pointer-events-auto backdrop-blur-sm shadow-lg shadow-neutral-950/50">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-neutral-900/60 border-b border-white/10 pointer-events-auto backdrop-blur-xl shadow-lg shadow-neutral-950/50">
             <nav className="p-3 space-y-2" aria-label="Mobile navigation">
               <MobileNavButton label="Gallery" onClick={() => { setActiveOverlay('gallery'); setShowMobileNav(false); }} />
               <MobileNavButton label="Setup" onClick={() => { setActiveOverlay('setup'); setShowMobileNav(false); }} />
@@ -192,9 +192,9 @@ export function CanvasLayout() {
         )}
       </header>
 
-      {/* Activity Feed Sidebar - Left (Desktop only via lg breakpoint) */}
+      {/* Activity Feed Sidebar - Left (Desktop only via lg breakpoint) - Half size with glass */}
       {showActivityFeed && (
-        <aside className="hidden lg:block absolute left-4 top-16 bottom-24 w-72 z-10 pointer-events-auto">
+        <aside className="hidden lg:block absolute left-4 top-20 w-48 max-h-[45%] z-10 pointer-events-auto">
           <ActivityFeed />
           {/* Collapse chevron */}
           <button
@@ -217,7 +217,7 @@ export function CanvasLayout() {
             onClick={() => setShowLeaderboard(false)}
             aria-label="Close leaderboard"
           />
-          <aside className="fixed lg:absolute right-0 lg:right-4 top-0 lg:top-16 bottom-0 lg:bottom-24 w-full sm:w-80 lg:w-72 z-50 lg:z-10 pointer-events-auto">
+          <aside className="fixed lg:absolute right-0 lg:right-4 top-0 lg:top-20 bottom-0 lg:bottom-28 w-full sm:w-72 lg:w-56 z-50 lg:z-10 pointer-events-auto">
             <AgentLeaderboard />
             {/* Close button for mobile / Collapse chevron for desktop */}
             <button
