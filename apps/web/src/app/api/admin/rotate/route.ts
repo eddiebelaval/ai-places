@@ -246,11 +246,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         }
         const supabase = getSupabaseAdmin();
         const redis = getRedis();
-        // Update Supabase canvas_state
+        // Update Supabase canvas_state (table has single row with id=1)
         const { error: dbError } = await supabase
           .from('canvas_state')
           .update({ week_number: weekNumber, updated_at: new Date().toISOString() })
-          .neq('id', '00000000-0000-0000-0000-000000000000');
+          .eq('id', 1);
         if (dbError) {
           return NextResponse.json({ error: `DB update failed: ${dbError.message}` }, { status: 500 });
         }
