@@ -42,9 +42,11 @@ function broadcastToAll(
   message: string
 ): void {
   let sentCount = 0;
+  let totalClients = 0;
 
   clients.forEach((sockets) => {
     sockets.forEach((ws) => {
+      totalClients++;
       if (ws.readyState === ws.OPEN) {
         ws.send(message);
         sentCount++;
@@ -52,8 +54,6 @@ function broadcastToAll(
     });
   });
 
-  // Log occasionally for metrics
-  if (sentCount > 0 && Math.random() < 0.01) {
-    console.log(`Broadcasted to ${sentCount} clients`);
-  }
+  // Always log for debugging
+  console.log(`Broadcasted to ${sentCount}/${totalClients} clients`);
 }
