@@ -28,6 +28,7 @@ export function setupSubscriber(
   // Handle incoming messages
   subscriber.on('message', (channel: string, message: string) => {
     if (channel === REDIS_KEYS.PUBSUB_PIXELS) {
+      console.log(`Received pub/sub message on ${channel}:`, message.substring(0, 80) + '...');
       broadcastToAll(clients, message);
     }
   });
