@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { PixelCanvas } from '@/components/canvas/PixelCanvas';
 import { ConnectionStatus } from '@/components/ui/ConnectionStatus';
@@ -38,6 +38,37 @@ export function CanvasLayout() {
     return () => {
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
+    };
+  }, []);
+
+  // CRITICAL: Document-level touch interceptor using capture phase
+  // This fires BEFORE Safari's gesture recognizer can claim the touch
+  useLayoutEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      // Check if touch is on the canvas area (main#main-canvas or its children)
+      const target = e.target as HTMLElement;
+      const mainCanvas = document.getElementById('main-canvas');
+      if (mainCanvas && mainCanvas.contains(target)) {
+        e.preventDefault();
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      const mainCanvas = document.getElementById('main-canvas');
+      if (mainCanvas && mainCanvas.contains(target)) {
+        e.preventDefault();
+      }
+    };
+
+    // Capture phase (third param true) runs BEFORE bubbling
+    // passive: false allows preventDefault to work
+    document.addEventListener('touchstart', handleTouchStart, { capture: true, passive: false });
+    document.addEventListener('touchmove', handleTouchMove, { capture: true, passive: false });
+
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart, { capture: true });
+      document.removeEventListener('touchmove', handleTouchMove, { capture: true });
     };
   }, []);
 
