@@ -23,6 +23,7 @@ function getSupabaseAdmin() {
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
+    const isDev = process.env.NODE_ENV !== 'production';
     const searchParams = request.nextUrl.searchParams;
     const sortByParam = searchParams.get('sortBy') || 'pixels';
     const limitParam = searchParams.get('limit') || '20';
@@ -52,6 +53,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       supabase = getSupabaseAdmin();
     } catch (credError) {
       console.error('Agents API: Missing Supabase credentials');
+      if (isDev) {
+        return NextResponse.json({
+          agents: [],
+          total: 0,
+          degraded: true,
+        });
+      }
       return NextResponse.json(
         { error: 'Service temporarily unavailable' },
         { status: 503 }

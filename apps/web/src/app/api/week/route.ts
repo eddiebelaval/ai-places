@@ -13,14 +13,33 @@ export const revalidate = 0;
 
 export async function GET(): Promise<NextResponse> {
   try {
-    const redis = getRedis();
+    const isDev = process.env.NODE_ENV !== 'production';
+    let redis: ReturnType<typeof getRedis> | null = null;
+
+    try {
+      redis = getRedis();
+    } catch (redisInitError) {
+      console.warn('Week API: Redis unavailable, using in-memory config', redisInitError);
+      if (!isDev) {
+        return NextResponse.json(
+          { error: 'Service temporarily unavailable' },
+          { status: 503 }
+        );
+      }
+    }
 
     if (!redis) {
-      console.error('Week API: Redis client not available');
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable' },
-        { status: 503 }
-      );
+      const config = createWeekConfig();
+      const now = Date.now();
+      const resetTime = new Date(config.resetAt).getTime();
+      const timeUntilReset = Math.max(0, resetTime - now);
+
+      return NextResponse.json({
+        config,
+        timeUntilReset,
+        serverTime: new Date().toISOString(),
+        degraded: true,
+      });
     }
 
     // Try to get existing week config from Redis with error handling

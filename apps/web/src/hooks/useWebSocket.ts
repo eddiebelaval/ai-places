@@ -14,7 +14,7 @@ import { wsDebug } from '@/lib/debug';
 
 // Production fallback ensures canvas works even if Vercel env var is misconfigured
 const PRODUCTION_WS_URL = 'wss://aiplaces-ws.railway.app';
-const DEFAULT_WS_URL = process.env.NODE_ENV === 'development' ? 'ws://localhost:8080' : PRODUCTION_WS_URL;
+const DEFAULT_WS_URL = process.env.NODE_ENV === 'production' ? PRODUCTION_WS_URL : '';
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || DEFAULT_WS_URL;
 
 interface UseWebSocketOptions {
@@ -26,6 +26,8 @@ interface UseWebSocketOptions {
 // Singleton WebSocket instance to prevent multiple connections
 let globalWs: WebSocket | null = null;
 let globalWsConnecting = false;
+let wsDisabledLogged = false;
+let wsCanvasFallbackLogged = false;
 
 export function useWebSocket(options: UseWebSocketOptions = {}) {
   const wsRef = useRef<WebSocket | null>(null);
@@ -152,8 +154,19 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   // Connect to WebSocket (singleton pattern)
   const connect = useCallback(() => {
     if (!WS_URL) {
-      wsDebug.warn(' WebSocket disabled: NEXT_PUBLIC_WS_URL not set');
+      if (!wsDisabledLogged) {
+        wsDebug.warn(' WebSocket disabled: NEXT_PUBLIC_WS_URL not set');
+        wsDisabledLogged = true;
+      }
       setConnected(false);
+      const { colorIndices } = useCanvasStore.getState();
+      if (!colorIndices) {
+        if (!wsCanvasFallbackLogged) {
+          wsDebug.warn(' Canvas state unavailable, rendering blank canvas');
+          wsCanvasFallbackLogged = true;
+        }
+        initializeCanvas('');
+      }
       return;
     }
 
@@ -211,6 +224,14 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         globalWs = null;
         wsRef.current = null;
         setConnected(false);
+        const { colorIndices } = useCanvasStore.getState();
+        if (!colorIndices) {
+          if (!wsCanvasFallbackLogged) {
+            wsDebug.warn(' Canvas state unavailable, rendering blank canvas');
+            wsCanvasFallbackLogged = true;
+          }
+          initializeCanvas('');
+        }
         if (mountedRef.current) {
           options.onDisconnected?.();
         }
@@ -249,7 +270,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       wsDebug.error(' Failed to connect:', err);
       globalWsConnecting = false;
     }
-  }, [handleMessage, setConnected, setReconnectAttempts, options]);
+  }, [handleMessage, initializeCanvas, setConnected, setReconnectAttempts, options]);
 
   // Send message
   const send = useCallback((message: ClientMessage) => {
