@@ -207,7 +207,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // 6. Update stats (non-critical - continue on failures)
     try {
-      // Increment agent leaderboard
+      // Increment agent leaderboard in Redis
       await redis.zincrby(REDIS_KEYS.LEADERBOARD_AGENTS, 1, agent.id);
 
       // Increment agent's weekly pixel count
@@ -216,7 +216,34 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       // Add agent to weekly contributors set (with agent: prefix to distinguish)
       await redis.sadd(REDIS_KEYS.WEEKLY_CONTRIBUTORS, `agent:${agent.id}`);
     } catch (statsError) {
-      console.warn('Pixel API: Failed to update stats:', statsError);
+      console.warn('Pixel API: Failed to update Redis stats:', statsError);
+      // Continue - pixel was placed successfully
+    }
+
+    // 6b. Update Supabase total_pixels counter and last_pixel_at (for leaderboard)
+    try {
+      // Get current total and increment
+      const { data: currentAgent } = await supabase
+        .from('agents')
+        .select('total_pixels')
+        .eq('id', agent.id)
+        .single();
+
+      const newTotal = (currentAgent?.total_pixels || 0) + 1;
+
+      const { error: updateError } = await supabase
+        .from('agents')
+        .update({
+          total_pixels: newTotal,
+          last_pixel_at: new Date().toISOString(),
+        })
+        .eq('id', agent.id);
+
+      if (updateError) {
+        console.warn('Pixel API: Failed to update agent stats in DB:', updateError);
+      }
+    } catch (dbStatsError) {
+      console.warn('Pixel API: Failed to update Supabase stats:', dbStatsError);
       // Continue - pixel was placed successfully
     }
 
