@@ -255,11 +255,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           return NextResponse.json({ error: `DB update failed: ${dbError.message}` }, { status: 500 });
         }
         // Update Redis week config
-        const configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
-        if (configStr) {
-          const config = JSON.parse(configStr as string);
-          config.weekNumber = weekNumber;
-          await redis.set(REDIS_KEYS.WEEK_CONFIG, JSON.stringify(config));
+        try {
+          const configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+          if (configStr && typeof configStr === 'string') {
+            const config = JSON.parse(configStr);
+            config.weekNumber = weekNumber;
+            await redis.set(REDIS_KEYS.WEEK_CONFIG, JSON.stringify(config));
+          }
+        } catch (redisError) {
+          console.warn('Failed to update Redis week config:', redisError);
+          // Continue - Supabase was updated successfully
         }
         return NextResponse.json({ success: true, weekNumber, message: `Week number set to ${weekNumber}` });
       }
