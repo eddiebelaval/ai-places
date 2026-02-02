@@ -30,7 +30,7 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
     onReady: () => debug.log('Canvas renderer ready'),
   });
 
-  const { viewport, getCanvasCoords, isDragging } = usePanZoom({
+  const { viewport, getCanvasCoords, isDragging, touchHandlers } = usePanZoom({
     containerRef,
     onCoordinateChange: (x, y) => {
       setCoordinates(x, y);
@@ -97,6 +97,7 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
       )}
       style={{ touchAction: 'none' }}
       onClick={handleClick}
+      {...touchHandlers}
       tabIndex={0}
       role="img"
       aria-label={`Pixel canvas, ${CANVAS_WIDTH} by ${CANVAS_HEIGHT} pixels. Use arrow keys to pan, plus and minus to zoom, zero to reset view.`}
