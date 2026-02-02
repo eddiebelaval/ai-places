@@ -239,6 +239,30 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         const result = await forceGameMode(modeId);
         return NextResponse.json(result, { status: result.success ? 200 : 400 });
       }
+      case 'set-week': {
+        const weekNumber = body.weekNumber as number;
+        if (typeof weekNumber !== 'number' || weekNumber < 1) {
+          return NextResponse.json({ error: 'weekNumber must be a positive integer' }, { status: 400 });
+        }
+        const supabase = getSupabaseAdmin();
+        const redis = getRedis();
+        // Update Supabase canvas_state
+        const { error: dbError } = await supabase
+          .from('canvas_state')
+          .update({ week_number: weekNumber, updated_at: new Date().toISOString() })
+          .neq('id', '00000000-0000-0000-0000-000000000000');
+        if (dbError) {
+          return NextResponse.json({ error: `DB update failed: ${dbError.message}` }, { status: 500 });
+        }
+        // Update Redis week config
+        const configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+        if (configStr) {
+          const config = JSON.parse(configStr as string);
+          config.weekNumber = weekNumber;
+          await redis.set(REDIS_KEYS.WEEK_CONFIG, JSON.stringify(config));
+        }
+        return NextResponse.json({ success: true, weekNumber, message: `Week number set to ${weekNumber}` });
+      }
       default: {
         const result = await performManualRotation({ dryRun: body.dryRun as boolean ?? false, forceMode: body.forceMode as string });
         return NextResponse.json(result, { status: result.success ? 200 : 500 });
