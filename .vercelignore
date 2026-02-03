@@ -1,0 +1,18 @@
+# Ignore local build and dependency artifacts
+**/node_modules
+**/.next
+**/dist
+**/build
+**/.turbo
+**/.DS_Store
+**/*.log
+
+# Ignore local tooling output
+**/.cache
+**/.parcel-cache
+**/.storybook
+**/.eslintcache
+
+# Ignore test artifacts
+**/coverage
+**/.nyc_output
