@@ -66,7 +66,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .from('canvas_archives')
       .select('*', { count: 'exact', head: true });
 
-    // Get paginated archives
+    // Get paginated archives with game mode info
     const { data: archives, error } = await supabase
       .from('canvas_archives')
       .select(`
@@ -78,7 +78,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         thumbnail_url,
         total_pixels_placed,
         unique_contributors,
-        created_at
+        created_at,
+        game_mode_id,
+        game_modes (
+          id,
+          name,
+          description,
+          icon,
+          difficulty
+        )
       `)
       .order('year', { ascending: false })
       .order('week_number', { ascending: false })

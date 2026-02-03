@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import type { UserSession, SubscriptionTier } from '@aiplaces/shared';
 
@@ -37,85 +37,82 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()(
-  devtools(
-    persist(
-      immer((set, get) => ({
-        user: null,
-        sessionToken: null,
-        isAuthenticated: false,
-        isLoading: true,
-        premiumStatus: null,
+  persist(
+    immer((set, get) => ({
+      user: null,
+      sessionToken: null,
+      isAuthenticated: false,
+      isLoading: true,
+      premiumStatus: null,
 
-        setUser: (user) => {
-          set((state) => {
-            state.user = user;
-            state.isAuthenticated = !!user;
-            state.isLoading = false;
-          });
-          // Fetch premium status when user is set
-          if (user) {
-            get().fetchPremiumStatus();
+      setUser: (user) => {
+        set((state) => {
+          state.user = user;
+          state.isAuthenticated = !!user;
+          state.isLoading = false;
+        });
+        // Fetch premium status when user is set
+        if (user) {
+          get().fetchPremiumStatus();
+        }
+      },
+
+      setSessionToken: (token) => {
+        set((state) => {
+          state.sessionToken = token;
+        });
+      },
+
+      setLoading: (loading) => {
+        set((state) => {
+          state.isLoading = loading;
+        });
+      },
+
+      setPremiumStatus: (status) => {
+        set((state) => {
+          state.premiumStatus = status;
+        });
+      },
+
+      fetchPremiumStatus: async () => {
+        const user = get().user;
+        if (!user) return;
+
+        try {
+          // No need to pass userId - endpoint uses authenticated session
+          const response = await fetch('/api/user/profile');
+          if (response.ok) {
+            const data = await response.json();
+            set((state) => {
+              state.premiumStatus = {
+                subscriptionTier: data.subscriptionTier,
+                emailVerified: data.emailVerified,
+                isPremium: data.isPremium,
+              };
+            });
           }
-        },
+        } catch (error) {
+          console.error('Failed to fetch premium status:', error);
+        }
+      },
 
-        setSessionToken: (token) => {
-          set((state) => {
-            state.sessionToken = token;
-          });
-        },
-
-        setLoading: (loading) => {
-          set((state) => {
-            state.isLoading = loading;
-          });
-        },
-
-        setPremiumStatus: (status) => {
-          set((state) => {
-            state.premiumStatus = status;
-          });
-        },
-
-        fetchPremiumStatus: async () => {
-          const user = get().user;
-          if (!user) return;
-
-          try {
-            // No need to pass userId - endpoint uses authenticated session
-            const response = await fetch('/api/user/profile');
-            if (response.ok) {
-              const data = await response.json();
-              set((state) => {
-                state.premiumStatus = {
-                  subscriptionTier: data.subscriptionTier,
-                  emailVerified: data.emailVerified,
-                  isPremium: data.isPremium,
-                };
-              });
-            }
-          } catch (error) {
-            console.error('Failed to fetch premium status:', error);
-          }
-        },
-
-        logout: () => {
-          set((state) => {
-            state.user = null;
-            state.sessionToken = null;
-            state.isAuthenticated = false;
-            state.premiumStatus = null;
-          });
-        },
-      })),
-      {
-        name: 'aiplaces-auth',
-        // Only persist the session token - user data is fetched from server
-        partialize: (state) => ({
-          sessionToken: state.sessionToken,
-        }),
-      }
-    ),
-    { name: 'AuthStore' }
+      logout: () => {
+        set((state) => {
+          state.user = null;
+          state.sessionToken = null;
+          state.isAuthenticated = false;
+          state.premiumStatus = null;
+        });
+      },
+    })),
+    {
+      name: 'aiplaces-auth',
+      // Only persist the session token - user data is fetched from server
+      partialize: (state) => ({
+        sessionToken: state.sessionToken,
+      }),
+    }
   )
 );
 

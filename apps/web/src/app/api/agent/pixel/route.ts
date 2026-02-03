@@ -186,10 +186,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       console.log(`Pixel API: Set pixel at (${x},${y}) to color ${color}`);
     } catch (canvasError: unknown) {
-      const errorMessage = canvasError instanceof Error ? canvasError.message : String(canvasError);
-      console.error('Pixel API: Failed to update canvas:', errorMessage, canvasError);
+      // Log full error details server-side for debugging
+      console.error('Pixel API: Failed to update canvas:', canvasError);
+      // Return generic error to client - never expose internal error details (CWE-209)
       return NextResponse.json(
-        { error: 'Failed to place pixel on canvas', details: errorMessage },
+        { error: 'Failed to place pixel on canvas' },
         { status: 500 }
       );
     }
@@ -206,7 +207,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // 6. Update stats (non-critical - continue on failures)
     try {
-      // Increment agent leaderboard
+      // Increment agent leaderboard in Redis
       await redis.zincrby(REDIS_KEYS.LEADERBOARD_AGENTS, 1, agent.id);
 
       // Increment agent's weekly pixel count
@@ -215,7 +216,55 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       // Add agent to weekly contributors set (with agent: prefix to distinguish)
       await redis.sadd(REDIS_KEYS.WEEKLY_CONTRIBUTORS, `agent:${agent.id}`);
     } catch (statsError) {
-      console.warn('Pixel API: Failed to update stats:', statsError);
+      console.warn('Pixel API: Failed to update Redis stats:', statsError);
+      // Continue - pixel was placed successfully
+    }
+
+    // 6b. Update Supabase total_pixels counter and last_pixel_at (for leaderboard)
+    try {
+      // Get current total and increment
+      const { data: currentAgent } = await supabase
+        .from('agents')
+        .select('total_pixels')
+        .eq('id', agent.id)
+        .single();
+
+      const newTotal = (currentAgent?.total_pixels || 0) + 1;
+
+      const { error: updateError } = await supabase
+        .from('agents')
+        .update({
+          total_pixels: newTotal,
+          last_pixel_at: new Date().toISOString(),
+        })
+        .eq('id', agent.id);
+
+      if (updateError) {
+        console.warn('Pixel API: Failed to update agent stats in DB:', updateError);
+      }
+    } catch (dbStatsError) {
+      console.warn('Pixel API: Failed to update Supabase stats:', dbStatsError);
+      // Continue - pixel was placed successfully
+    }
+
+    // 7. Broadcast pixel update to all connected WebSocket clients
+    try {
+      const pixelUpdate = {
+        type: 'pixel_placed',
+        payload: {
+          x,
+          y,
+          color,
+          userId: `agent:${agent.id}`,
+          username: agent.name,
+          factionId: null,
+          timestamp: Date.now(),
+          isAgent: true,
+        },
+      };
+      await redis.publish(REDIS_KEYS.PUBSUB_PIXELS, JSON.stringify(pixelUpdate));
+    } catch (broadcastError) {
+      console.warn('Pixel API: Failed to broadcast update:', broadcastError);
       // Continue - pixel was placed successfully
     }
 

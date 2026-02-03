@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { nanoid } from 'nanoid';
 import { sendVerificationEmail } from '@/lib/email/resend';
 
@@ -31,6 +32,21 @@ function isValidEmail(email: string): boolean {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    // SECURITY: Authenticate user from session to prevent IDOR attacks
+    // Never trust userId from request body - always use session
+    const supabaseAuth = await createServerClient();
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Use authenticated user's ID - prevents attackers from modifying other users' subscriptions
+    const userId = user.id;
+
     // Parse request body with error handling
     let body;
     try {
@@ -41,7 +57,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         { status: 400 }
       );
     }
-    const { email, userId, username } = body;
+    const { email, username } = body;
 
     // Validate input
     if (!email || typeof email !== 'string') {
@@ -54,13 +70,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!isValidEmail(email)) {
       return NextResponse.json(
         { error: 'Invalid email address' },
-        { status: 400 }
-      );
-    }
-
-    if (!userId || typeof userId !== 'string') {
-      return NextResponse.json(
-        { error: 'User ID is required' },
         { status: 400 }
       );
     }

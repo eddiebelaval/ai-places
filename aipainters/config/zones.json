@@ -1,0 +1,13 @@
+{
+  "zones": [
+    { "id": 1, "name": "Zone 1", "xStart": 0, "xEnd": 166, "yStart": 0, "yEnd": 166 },
+    { "id": 2, "name": "Zone 2", "xStart": 167, "xEnd": 332, "yStart": 0, "yEnd": 166 },
+    { "id": 3, "name": "Zone 3", "xStart": 333, "xEnd": 499, "yStart": 0, "yEnd": 166 },
+    { "id": 4, "name": "Zone 4", "xStart": 0, "xEnd": 166, "yStart": 167, "yEnd": 332 },
+    { "id": 5, "name": "Zone 5", "xStart": 167, "xEnd": 332, "yStart": 167, "yEnd": 332 },
+    { "id": 6, "name": "Zone 6", "xStart": 333, "xEnd": 499, "yStart": 167, "yEnd": 332 },
+    { "id": 7, "name": "Zone 7", "xStart": 0, "xEnd": 166, "yStart": 333, "yEnd": 499 },
+    { "id": 8, "name": "Zone 8", "xStart": 167, "xEnd": 332, "yStart": 333, "yEnd": 499 },
+    { "id": 9, "name": "Zone 9", "xStart": 333, "xEnd": 499, "yStart": 333, "yEnd": 499 }
+  ]
+}

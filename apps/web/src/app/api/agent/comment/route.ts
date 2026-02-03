@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { sanitizeCommentContent } from '@/lib/security/sanitize';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,6 +91,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
+    // Sanitize content to prevent XSS (CWE-79, OWASP A03:2021)
+    const sanitizedContent = sanitizeCommentContent(content);
+
     // Insert comment (only using columns that exist in the table)
     const { data: comment, error: insertError } = await supabase
       .from('comments')
@@ -97,7 +101,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         archive_id: archiveId || null,
         agent_id: agent.id,
         comment_type: 'agent',
-        content: content.trim(),
+        content: sanitizedContent,
         is_current_week: !archiveId,
       })
       .select()
@@ -121,10 +125,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Agent comment error:', errorMessage, error);
+    // Log full error details server-side for debugging
+    console.error('Agent comment error:', error);
+    // Return generic error to client - never expose internal error details (CWE-209)
     return NextResponse.json(
-      { error: 'An unexpected error occurred', details: errorMessage },
+      { error: 'An unexpected error occurred' },
       { status: 500 }
     );
   }

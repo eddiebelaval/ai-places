@@ -12,7 +12,10 @@ import type {
 } from '@aiplaces/shared';
 import { wsDebug } from '@/lib/debug';
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
+// Production fallback ensures canvas works even if Vercel env var is misconfigured
+const PRODUCTION_WS_URL = 'wss://aiplaces-ws.railway.app';
+const DEFAULT_WS_URL = process.env.NODE_ENV === 'development' ? 'ws://localhost:8080' : PRODUCTION_WS_URL;
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL || DEFAULT_WS_URL;
 
 interface UseWebSocketOptions {
   onConnected?: () => void;
@@ -64,9 +67,24 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             break;
 
           case 'pixel_placed':
-            const { x, y, color } = message.payload;
-            console.log(`[WS] Pixel placed at (${x}, ${y}) with color ${color}`);
+            const { x, y, color, username, userId, isAgent } = message.payload;
+            console.log(`[WS] Pixel placed at (${x}, ${y}) with color ${color} by ${username || 'unknown'}`);
             updatePixel(x, y, color as ColorIndex);
+            // Dispatch pixel_activity event for ActivityFeed component
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(
+                new CustomEvent('pixel_activity', {
+                  detail: {
+                    x,
+                    y,
+                    color,
+                    // Map server field names to what ActivityFeed expects
+                    agentName: isAgent ? username : undefined,
+                    agentId: isAgent ? userId : undefined,
+                  },
+                })
+              );
+            }
             break;
 
           case 'pixel_error':
@@ -133,6 +151,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   // Connect to WebSocket (singleton pattern)
   const connect = useCallback(() => {
+    if (!WS_URL) {
+      wsDebug.warn(' WebSocket disabled: NEXT_PUBLIC_WS_URL not set');
+      setConnected(false);
+      return;
+    }
+
     // If already connected or connecting, reuse the existing connection
     if (globalWs?.readyState === WebSocket.OPEN) {
       wsDebug.log(' Already connected (global)');
@@ -225,7 +249,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       wsDebug.error(' Failed to connect:', err);
       globalWsConnecting = false;
     }
-  }, [handleMessage, setConnected, options]);
+  }, [handleMessage, setConnected, setReconnectAttempts, options]);
 
   // Send message
   const send = useCallback((message: ClientMessage) => {

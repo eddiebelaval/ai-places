@@ -1,0 +1,30 @@
+{
+  "name": "aipainters",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/scripts/run-coordinator.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/scripts/run-coordinator.js",
+    "register-agents": "tsx src/scripts/register-agents.ts",
+    "dashboard": "tsx src/scripts/run-dashboard.ts",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop aipainters aipainters-dashboard",
+    "pm2:restart": "pm2 restart aipainters aipainters-dashboard",
+    "pm2:logs": "pm2 logs",
+    "pm2:monit": "pm2 monit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.10",
+    "@types/ws": "^8.5.12",
+    "tsx": "^4.15.6",
+    "typescript": "^5.6.3"
+  }
+}

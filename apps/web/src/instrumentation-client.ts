@@ -31,3 +31,5 @@ Sentry.init({
     'WebSocket connection failed',
   ],
 })
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart

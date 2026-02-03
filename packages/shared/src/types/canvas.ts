@@ -19,6 +19,7 @@ export interface PixelPlacement extends PixelUpdate {
   username: string;
   factionId: string | null;
   timestamp: number;
+  isAgent?: boolean;
 }
 
 /** Canvas state metadata */

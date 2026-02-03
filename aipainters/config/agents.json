@@ -1,0 +1,114 @@
+{
+  "agents": [
+    {
+      "id": "geometric-mind",
+      "name": "GeometricMind",
+      "description": "Mathematical patterns, fractals, tessellations",
+      "type": "geometric-mind",
+      "colors": [12, 13],
+      "minDelayMs": 35000,
+      "maxDelayMs": 45000,
+      "preferredZones": [1, 2, 3],
+      "apiKeyEnv": "AIP_GEOMETRIC_KEY"
+    },
+    {
+      "id": "organic-flow",
+      "name": "OrganicFlow",
+      "description": "Natural curves and flowing lines",
+      "type": "organic-flow",
+      "colors": [9, 10],
+      "minDelayMs": 30000,
+      "maxDelayMs": 40000,
+      "preferredZones": [6],
+      "apiKeyEnv": "AIP_ORGANIC_KEY"
+    },
+    {
+      "id": "pixel-punk",
+      "name": "PixelPunk",
+      "description": "8-bit sprites and retro art",
+      "type": "pixel-punk",
+      "colors": [4, 8, 11],
+      "minDelayMs": 40000,
+      "maxDelayMs": 50000,
+      "preferredZones": [4, 5],
+      "apiKeyEnv": "AIP_PIXELPUNK_KEY"
+    },
+    {
+      "id": "minimalist-zen",
+      "name": "MinimalistZen",
+      "description": "Sparse dots and negative space",
+      "type": "minimalist-zen",
+      "colors": [0, 1, 4],
+      "minDelayMs": 60000,
+      "maxDelayMs": 90000,
+      "preferredZones": [7],
+      "apiKeyEnv": "AIP_ZEN_KEY"
+    },
+    {
+      "id": "chaos-crafter",
+      "name": "ChaosCrafter",
+      "description": "Controlled randomness and gap filling",
+      "type": "chaos-crafter",
+      "colors": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      "minDelayMs": 240000,
+      "maxDelayMs": 300000,
+      "preferredZones": [9],
+      "apiKeyEnv": "AIP_CHAOS_KEY"
+    },
+    {
+      "id": "pattern-weaver",
+      "name": "PatternWeaver",
+      "description": "Repeating cultural motifs and tessellations",
+      "type": "pattern-weaver",
+      "colors": [6, 14, 15],
+      "minDelayMs": 50000,
+      "maxDelayMs": 60000,
+      "preferredZones": [8],
+      "apiKeyEnv": "AIP_PATTERN_KEY"
+    },
+    {
+      "id": "quantum-painter",
+      "name": "QuantumPainter",
+      "description": "Abstract color fields and gradients",
+      "type": "quantum-painter",
+      "colors": [11, 12, 13, 14],
+      "minDelayMs": 70000,
+      "maxDelayMs": 90000,
+      "preferredZones": [5],
+      "apiKeyEnv": "AIP_QUANTUM_KEY"
+    },
+    {
+      "id": "retro-bot",
+      "name": "RetroBot",
+      "description": "80s wireframes and grid shapes",
+      "type": "retro-bot",
+      "colors": [11, 15],
+      "minDelayMs": 40000,
+      "maxDelayMs": 60000,
+      "preferredZones": [2, 5],
+      "apiKeyEnv": "AIP_RETRO_KEY"
+    },
+    {
+      "id": "natural-code",
+      "name": "NaturalCode",
+      "description": "DNA helixes and bio-inspired patterns",
+      "type": "natural-code",
+      "colors": [7, 9, 10],
+      "minDelayMs": 50000,
+      "maxDelayMs": 70000,
+      "preferredZones": [6, 4],
+      "apiKeyEnv": "AIP_NATURAL_KEY"
+    },
+    {
+      "id": "meme-painter",
+      "name": "MemePainter",
+      "description": "Internet symbols and simple recognizable shapes",
+      "type": "meme-painter",
+      "colors": [5, 8, 13],
+      "minDelayMs": 90000,
+      "maxDelayMs": 120000,
+      "preferredZones": [3],
+      "apiKeyEnv": "AIP_MEME_KEY"
+    }
+  ]
+}

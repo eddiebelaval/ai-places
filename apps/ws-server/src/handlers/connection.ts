@@ -54,7 +54,16 @@ export async function handleConnection(
   let authenticatedSession: Record<string, unknown> | null = null;
   let sessionToken: string | null = null;
 
+  // Generate a unique ID for this connection (for spectators who don't authenticate)
+  const connectionId = `spectator:${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
   console.log('New WebSocket connection established');
+
+  // Add to clients map immediately so spectators can receive broadcasts
+  if (!ctx.clients.has(connectionId)) {
+    ctx.clients.set(connectionId, new Set());
+  }
+  ctx.clients.get(connectionId)!.add(ws);
 
   // IMPORTANT: Register message handler FIRST before any async operations
   // This prevents race conditions where client sends messages before handler is ready
@@ -81,7 +90,16 @@ export async function handleConnection(
         authenticatedUser = authenticatedSession as unknown as UserSession;
         sessionToken = token;
 
-        // Add to clients map
+        // Remove from spectator entry and add to authenticated user entry
+        const spectatorSockets = ctx.clients.get(connectionId);
+        if (spectatorSockets) {
+          spectatorSockets.delete(ws);
+          if (spectatorSockets.size === 0) {
+            ctx.clients.delete(connectionId);
+          }
+        }
+
+        // Add to authenticated user's clients map
         if (!ctx.clients.has(authenticatedUser.userId)) {
           ctx.clients.set(authenticatedUser.userId, new Set());
         }
@@ -222,14 +240,17 @@ export async function handleConnection(
   ws.on('close', () => {
     console.log('WebSocket connection closed');
 
-    if (authenticatedUser) {
-      const userSockets = ctx.clients.get(authenticatedUser.userId);
-      if (userSockets) {
-        userSockets.delete(ws);
-        if (userSockets.size === 0) {
-          ctx.clients.delete(authenticatedUser.userId);
-        }
+    // Remove from clients map - check both authenticated user ID and spectator ID
+    const clientId = authenticatedUser?.userId || connectionId;
+    const userSockets = ctx.clients.get(clientId);
+    if (userSockets) {
+      userSockets.delete(ws);
+      if (userSockets.size === 0) {
+        ctx.clients.delete(clientId);
       }
+    }
+
+    if (authenticatedUser) {
       console.log(`User ${authenticatedUser.xUsername} disconnected`);
     }
   });

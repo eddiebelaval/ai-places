@@ -24,9 +24,9 @@ export async function GET(): Promise<NextResponse> {
     }
 
     // Try to get existing week config from Redis with error handling
-    let configStr: string | null = null;
+    let configRaw: unknown = null;
     try {
-      configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+      configRaw = await redis.get(REDIS_KEYS.WEEK_CONFIG);
     } catch (redisError) {
       console.error('Week API: Redis GET error:', redisError);
       // Fall through to create default config
@@ -34,11 +34,19 @@ export async function GET(): Promise<NextResponse> {
 
     let config: WeekConfig;
 
-    if (configStr && typeof configStr === 'string') {
-      try {
-        config = JSON.parse(configStr);
-      } catch (parseError) {
-        console.error('Week API: Failed to parse config from Redis, creating new:', parseError);
+    if (configRaw) {
+      // Handle both string and object responses from Upstash Redis
+      if (typeof configRaw === 'string') {
+        try {
+          config = JSON.parse(configRaw);
+        } catch (parseError) {
+          console.error('Week API: Failed to parse config from Redis, creating new:', parseError);
+          config = createWeekConfig();
+        }
+      } else if (typeof configRaw === 'object') {
+        // Upstash sometimes returns parsed objects directly
+        config = configRaw as WeekConfig;
+      } else {
         config = createWeekConfig();
       }
     } else {

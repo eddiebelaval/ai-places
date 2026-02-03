@@ -14,7 +14,19 @@ interface ArchiveDetail {
   thumbnailUrl: string | null;
   totalPixelsPlaced: number;
   uniqueContributors: number;
-  metadata: Record<string, unknown>;
+  metadata: {
+    objectives?: Array<{
+      id: string;
+      name: string;
+      description: string;
+      icon?: string;
+    }>;
+    topContributor?: {
+      id: string;
+      name: string;
+      pixelCount: number;
+    };
+  };
 }
 
 interface LeaderboardEntry {
@@ -181,6 +193,35 @@ export default async function ArchiveDetailPage({
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Game Modes/Objectives */}
+            {archive.metadata?.objectives && archive.metadata.objectives.length > 0 && (
+              <div className="bg-neutral-900 rounded-lg border border-neutral-800 p-4">
+                <h2 className="text-lg font-semibold mb-4">Game Modes</h2>
+                <div className="space-y-2">
+                  {archive.metadata.objectives.map((objective: { id: string; name: string; icon?: string; description?: string; progress?: number }) => (
+                    <div
+                      key={objective.id}
+                      className="p-3 bg-neutral-800 rounded-lg border border-neutral-700"
+                    >
+                      <div className="flex items-start gap-2">
+                        {objective.icon && (
+                          <span className="text-lg" role="img" aria-label={objective.name}>
+                            {getIconForObjective(objective.icon)}
+                          </span>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white">{objective.name}</p>
+                          <p className="text-xs text-neutral-400 mt-0.5">
+                            {objective.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Stats */}
             <div className="bg-neutral-900 rounded-lg border border-neutral-800 p-4">
               <h2 className="text-lg font-semibold mb-4">Statistics</h2>
@@ -269,4 +310,16 @@ function StatCard({ label, value }: { label: string; value: string }) {
       <span className="text-xs text-neutral-400">{label}</span>
     </div>
   );
+}
+
+function getIconForObjective(iconName: string): string {
+  const iconMap: Record<string, string> = {
+    crown: '👑',
+    users: '👥',
+    zap: '⚡',
+    star: '⭐',
+    check: '✓',
+    shield: '🛡️',
+  };
+  return iconMap[iconName] || '🎯';
 }

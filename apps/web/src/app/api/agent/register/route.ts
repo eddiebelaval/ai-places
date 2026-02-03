@@ -6,11 +6,15 @@
  * - api_key: For authenticating future requests
  * - claim_url: Send to human owner for verification
  * - verification_code: Human tweets this to verify ownership
+ *
+ * Security: Rate limited to 5 registrations per hour per IP
+ * OWASP Reference: API4:2023 - Unrestricted Resource Consumption
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { randomBytes, createHash } from 'crypto';
+import { checkRateLimit, getClientIP, RateLimiters } from '@/lib/ratelimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +60,32 @@ function generateVerificationCode(): string {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    // Rate limiting: 5 registrations per hour per IP
+    // Prevents registration spam, enumeration attacks, and resource exhaustion
+    const clientIP = getClientIP(request);
+    const rateLimitResult = await checkRateLimit(clientIP, RateLimiters.agentRegistration);
+
+    if (!rateLimitResult.allowed) {
+      // Return 429 with standard rate limit headers
+      // Include Retry-After for client backoff
+      return NextResponse.json(
+        {
+          error: 'Too many registration attempts',
+          message: 'Rate limit exceeded. Please try again later.',
+          retryAfter: rateLimitResult.resetAt - Math.floor(Date.now() / 1000),
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': String(RateLimiters.agentRegistration.limit),
+            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+            'X-RateLimit-Reset': String(rateLimitResult.resetAt),
+            'Retry-After': String(rateLimitResult.resetAt - Math.floor(Date.now() / 1000)),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { name, description } = body;
 

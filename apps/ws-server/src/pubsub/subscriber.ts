@@ -40,19 +40,11 @@ function broadcastToAll(
   clients: Map<string, Set<WebSocket>>,
   message: string
 ): void {
-  let sentCount = 0;
-
   clients.forEach((sockets) => {
     sockets.forEach((ws) => {
       if (ws.readyState === ws.OPEN) {
         ws.send(message);
-        sentCount++;
       }
     });
   });
-
-  // Log occasionally for metrics
-  if (sentCount > 0 && Math.random() < 0.01) {
-    console.log(`Broadcasted to ${sentCount} clients`);
-  }
 }

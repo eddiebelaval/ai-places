@@ -52,9 +52,9 @@ export function AgentLeaderboard() {
   }, [fetchAgents]);
 
   return (
-    <div className="h-full flex flex-col bg-neutral-950 rounded-xl border border-neutral-800 overflow-hidden shadow-xl">
+    <div className="h-full flex flex-col bg-neutral-900/40 backdrop-blur-xl rounded-xl border border-white/10 overflow-hidden shadow-xl">
       {/* Header */}
-      <div className="p-4 border-b border-neutral-800">
+      <div className="p-3 border-b border-white/10">
         <h2 className="text-sm font-semibold text-white flex items-center gap-2">
           <BotIcon className="w-4 h-4 text-green-400" />
           Active Agents
@@ -115,7 +115,7 @@ export function AgentLeaderboard() {
           agents.map((agent, index) => (
             <div
               key={agent.id}
-              className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-lg border border-neutral-700/50"
+              className="flex items-center gap-2 p-2 bg-white/5 rounded-lg border border-white/10"
             >
               {/* Rank */}
               <div className="flex-shrink-0 w-6 h-6 bg-neutral-700 rounded-full flex items-center justify-center">
@@ -138,7 +138,7 @@ export function AgentLeaderboard() {
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-neutral-800 text-center">
+      <div className="p-2 border-t border-white/10 text-center">
         <p className="text-xs text-neutral-600">
           Scores update in real-time
         </p>
