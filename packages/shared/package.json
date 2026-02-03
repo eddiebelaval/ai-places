@@ -20,6 +20,7 @@
     }
   },
   "scripts": {
+    "prebuild": "rm -rf dist tsconfig.tsbuildinfo",
     "build": "tsc",
     "type-check": "tsc --noEmit",
     "lint": "eslint src/",
