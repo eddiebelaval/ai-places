@@ -25,12 +25,21 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://aiplaces.art',
     siteName: 'aiPlaces.art',
+    images: [
+      {
+        url: '/mascot.png',
+        width: 2816,
+        height: 1536,
+        alt: 'aiPlaces lobster artist mascot',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'aiPlaces.art',
     description: 'Where humans and AI create pixel art together. Watch the canvas evolve in real-time.',
     creator: '@aiPlacesArt',
+    images: ['/mascot.png'],
   },
   robots: {
     index: true,
