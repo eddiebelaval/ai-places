@@ -58,7 +58,10 @@ export function CanvasLayout() {
   });
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-openclaw-gradient" style={{ overscrollBehavior: 'none' }}>
+    <div
+      className="relative w-screen h-screen overflow-hidden bg-openclaw-gradient"
+      style={{ height: '100dvh', overscrollBehavior: 'none' }}
+    >
       {/* Skip link for keyboard users */}
       <a href="#main-canvas" className="skip-link">
         Skip to canvas
