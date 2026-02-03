@@ -101,7 +101,7 @@ export function ArchiveDetailModal({ archiveId, onClose }: ArchiveDetailModalPro
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto" data-allow-scroll>
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
@@ -223,7 +223,7 @@ function LeaderboardCard({ leaderboards, activeTab, onTabChange }: { leaderboard
         ))}
       </div>
 
-      <div className="space-y-2 max-h-64 overflow-y-auto">
+      <div className="space-y-2 max-h-64 overflow-y-auto" data-allow-scroll>
         {currentLeaderboard.length > 0 ? (
           currentLeaderboard.map((entry, index) => (
             <div key={entry.userId || entry.agentId || index} className="flex items-center justify-between py-2 px-3 bg-neutral-900 rounded border border-neutral-700">

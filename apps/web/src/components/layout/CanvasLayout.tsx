@@ -57,6 +57,66 @@ export function CanvasLayout() {
     onError: (error) => debug.error('WebSocket error:', error),
   });
 
+  // iOS Safari: lock body scroll so touch gestures reach the canvas
+  useEffect(() => {
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (!isIOS) return;
+
+    const body = document.body;
+    const docEl = document.documentElement;
+    const scrollY = window.scrollY;
+
+    const prev = {
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyLeft: body.style.left,
+      bodyRight: body.style.right,
+      bodyWidth: body.style.width,
+      bodyHeight: body.style.height,
+      bodyOverflow: body.style.overflow,
+      bodyTouchAction: body.style.touchAction,
+      docHeight: docEl.style.height,
+      docOverscroll: docEl.style.overscrollBehavior,
+    };
+
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+    body.style.height = '100%';
+    body.style.overflow = 'hidden';
+    body.style.touchAction = 'none';
+    docEl.style.height = '100%';
+    docEl.style.overscrollBehavior = 'none';
+
+    const preventTouchMove = (event: TouchEvent) => {
+      if (!event.cancelable) return;
+      const target = event.target as Element | null;
+      if (target?.closest('[data-allow-scroll]')) return;
+      event.preventDefault();
+    };
+
+    document.addEventListener('touchmove', preventTouchMove, { passive: false, capture: true });
+
+    return () => {
+      document.removeEventListener('touchmove', preventTouchMove);
+      body.style.position = prev.bodyPosition;
+      body.style.top = prev.bodyTop;
+      body.style.left = prev.bodyLeft;
+      body.style.right = prev.bodyRight;
+      body.style.width = prev.bodyWidth;
+      body.style.height = prev.bodyHeight;
+      body.style.overflow = prev.bodyOverflow;
+      body.style.touchAction = prev.bodyTouchAction;
+      docEl.style.height = prev.docHeight;
+      docEl.style.overscrollBehavior = prev.docOverscroll;
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   return (
     <div
       className="relative w-screen h-screen overflow-hidden bg-openclaw-gradient"

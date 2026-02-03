@@ -91,7 +91,7 @@ export function OverlayModal({
         </div>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto p-5">
+        <div className="flex-1 overflow-y-auto p-5" data-allow-scroll>
           {children}
         </div>
       </div>

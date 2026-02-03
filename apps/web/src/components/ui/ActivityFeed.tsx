@@ -85,6 +85,7 @@ export function ActivityFeed() {
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-2 space-y-1"
+        data-allow-scroll
       >
         {activities.length === 0 ? (
           <div className="text-center py-8">

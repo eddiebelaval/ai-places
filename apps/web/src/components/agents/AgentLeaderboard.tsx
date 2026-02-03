@@ -94,6 +94,7 @@ export function AgentLeaderboard() {
         role="tabpanel"
         aria-labelledby={`sort-tab-${sortBy}`}
         className="flex-1 overflow-y-auto p-2 space-y-2"
+        data-allow-scroll
       >
         {loading ? (
           <div className="flex items-center justify-center h-32">

@@ -115,8 +115,8 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
       }
     };
 
-    document.addEventListener('touchstart', preventCanvasScroll, { passive: false });
-    document.addEventListener('touchmove', preventCanvasScroll, { passive: false });
+    document.addEventListener('touchstart', preventCanvasScroll, { passive: false, capture: true });
+    document.addEventListener('touchmove', preventCanvasScroll, { passive: false, capture: true });
 
     return () => {
       document.removeEventListener('touchstart', preventCanvasScroll);
