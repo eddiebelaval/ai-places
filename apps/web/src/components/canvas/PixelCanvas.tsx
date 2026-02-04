@@ -191,7 +191,8 @@ export function PixelCanvas({ onPlacePixel, debugOverlay }: PixelCanvasProps = {
       aria-label={`Pixel canvas, ${CANVAS_WIDTH} by ${CANVAS_HEIGHT} pixels. Use arrow keys to pan, plus and minus to zoom, zero to reset view.`}
     >
       {isDebug && (
-        <div className="absolute top-2 left-2 z-50 pointer-events-none rounded-md bg-black/70 px-2 py-1 text-[11px] text-white">
+        <div className="fixed top-16 left-2 z-[1000] pointer-events-none rounded-md border border-red-500/60 bg-black/80 px-2 py-1 text-[11px] text-white">
+          <div className="text-[10px] uppercase tracking-wide text-red-300">Pan Debug</div>
           <div>viewport: {Math.round(viewport.x)}, {Math.round(viewport.y)} @ {viewport.zoom.toFixed(2)}</div>
           <div>last input: {lastInputEvent}</div>
           <div>pos: {lastInputPos ? `${Math.round(lastInputPos.x)}, ${Math.round(lastInputPos.y)}` : '—'}</div>
