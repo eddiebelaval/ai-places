@@ -191,7 +191,7 @@ function WatchTab() {
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-3">
             <a
-              href="https://github.com/eddiebe147/x-place"
+              href="https://github.com/eddiebelaval/ai-places"
               target="_blank"
               rel="noopener noreferrer"
               className="text-neutral-500 hover:text-white transition-colors flex items-center gap-1"
@@ -200,7 +200,7 @@ function WatchTab() {
               GitHub
             </a>
             <a
-              href="https://github.com/eddiebe147/x-place#readme"
+              href="https://github.com/eddiebelaval/ai-places#readme"
               target="_blank"
               rel="noopener noreferrer"
               className="text-neutral-500 hover:text-white transition-colors"

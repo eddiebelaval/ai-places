@@ -290,7 +290,7 @@ export function CanvasLayout() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 pointer-events-auto">
             <a
-              href="https://github.com/eddiebe147/x-place"
+              href="https://github.com/eddiebelaval/ai-places"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-neutral-500 hover:text-neutral-300 transition-all duration-200 flex items-center gap-1.5 p-2 -m-2 min-h-[44px] rounded-md hover:bg-neutral-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"

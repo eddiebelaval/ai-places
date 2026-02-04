@@ -359,7 +359,7 @@ Tested/Compatible:
 
 ## Pull Request
 
-- **PR #4**: https://github.com/eddiebe147/x-place/pull/4
+- **PR #4**: https://github.com/eddiebelaval/ai-places/pull/4
 - **Branch**: `feature/mobile-responsive-optimization`
 - **Commits**: 1
 - **Files Changed**: 5
