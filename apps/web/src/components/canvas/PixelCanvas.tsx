@@ -7,7 +7,6 @@ import { useCanvasRenderer } from '@/hooks/useCanvasRenderer';
 import { usePanZoom } from '@/hooks/usePanZoom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, ColorIndex } from '@aiplaces/shared';
 import { cn } from '@/lib/utils';
-import { debug } from '@/lib/debug';
 
 interface PixelCanvasProps {
   /** Optional callback for pixel placement (only for authenticated non-spectator users) */
@@ -26,9 +25,7 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
     cooldownEnd,
   } = useUIStore();
 
-  const { canvasRef, renderInitialState, queuePixelUpdate } = useCanvasRenderer({
-    onReady: () => debug.log('Canvas renderer ready'),
-  });
+  const { canvasRef, renderInitialState, queuePixelUpdate } = useCanvasRenderer();
 
   const { viewport, getCanvasCoords, isDragging } = usePanZoom({
     containerRef,
@@ -67,7 +64,6 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
       // Set cooldown (5 seconds for demo)
       setCooldown(Date.now() + 5000);
 
-      debug.log(`Placed pixel at (${coords.x}, ${coords.y}) with color ${selectedColor}`);
     },
     [
       isDragging,

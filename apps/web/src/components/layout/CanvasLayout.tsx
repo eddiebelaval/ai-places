@@ -14,7 +14,6 @@ import { ActivityFeed } from '@/components/ui/ActivityFeed';
 import { SetupModule } from '@/components/setup/SetupModule';
 import { GalleryContent } from '@/components/gallery/GalleryContent';
 import { GamesModule } from '@/components/games/GamesModule';
-import { debug } from '@/lib/debug';
 import { EdgeTab } from '@/components/ui/EdgeTab';
 
 type OverlayType = 'gallery' | 'setup' | 'games' | null;
@@ -51,11 +50,7 @@ export function CanvasLayout() {
   };
 
   // Initialize WebSocket connection (spectator mode - no pixel placing)
-  useWebSocket({
-    onConnected: () => debug.log('WebSocket connected'),
-    onDisconnected: () => debug.log('WebSocket disconnected'),
-    onError: (error) => debug.error('WebSocket error:', error),
-  });
+  useWebSocket();
 
   // Disable existing service workers to avoid stale PWA caching on mobile
   useEffect(() => {

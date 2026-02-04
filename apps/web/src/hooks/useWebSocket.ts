@@ -10,7 +10,6 @@ import type {
   ServerMessage,
   ColorIndex,
 } from '@aiplaces/shared';
-import { wsDebug } from '@/lib/debug';
 
 // Production fallback ensures canvas works even if Vercel env var is misconfigured
 const PRODUCTION_WS_URL = 'wss://aiplaces-ws.railway.app';
@@ -58,11 +57,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     (event: MessageEvent) => {
       try {
         const message: ServerMessage = JSON.parse(event.data);
-        wsDebug.log(' Received:', message.type);
-
         switch (message.type) {
           case 'authenticated':
-            wsDebug.log(' Authenticated as:', message.payload.username);
             // Set initial cooldown if any
             if (message.payload.cooldownSeconds > 0) {
               setCooldown(Date.now() + message.payload.cooldownSeconds * 1000);
@@ -70,17 +66,15 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             break;
 
           case 'auth_error':
-            wsDebug.error(' Auth error:', message.payload.message);
+            console.error('[WS] Auth error:', message.payload.message);
             break;
 
           case 'canvas_state':
-            wsDebug.log(' Received canvas state, version:', message.payload.version);
             initializeCanvas(message.payload.data);
             break;
 
           case 'pixel_placed':
             const { x, y, color, username, userId, isAgent } = message.payload;
-            console.log(`[WS] Pixel placed at (${x}, ${y}) with color ${color} by ${username || 'unknown'}`);
             updatePixel(x, y, color as ColorIndex);
             // Dispatch pixel_activity event for ActivityFeed component
             if (typeof window !== 'undefined') {
@@ -100,7 +94,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             break;
 
           case 'pixel_error':
-            wsDebug.error(' Pixel error:', message.payload.code, message.payload.message);
+            console.error('[WS] Pixel error:', message.payload.code, message.payload.message);
             if (message.payload.remainingMs) {
               setCooldown(Date.now() + message.payload.remainingMs);
             }
@@ -111,15 +105,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             break;
 
           case 'pong':
-            wsDebug.log(' Pong received, server time:', message.payload.serverTime);
             break;
 
           case 'connection_count':
-            wsDebug.log(' Active connections:', message.payload.count);
             break;
 
           case 'leaderboard_update':
-            wsDebug.log(' Leaderboard update received');
             if (typeof window !== 'undefined') {
               window.dispatchEvent(
                 new CustomEvent('leaderboard_update', {
@@ -130,12 +121,10 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             break;
 
           case 'week_config':
-            wsDebug.log(' Week config received:', message.payload.weekNumber);
             setConfig(message.payload);
             break;
 
           case 'week_reset':
-            wsDebug.log(' Week reset!', message.payload.archiveId);
             // Clear canvas and update week config
             setResetting(true);
             // Small delay to show "resetting" state
@@ -147,15 +136,14 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             break;
 
           case 'week_warning':
-            wsDebug.log(' Week warning:', message.payload.minutesRemaining, 'minutes remaining');
             // Could show a toast notification here
             break;
 
           default:
-            wsDebug.log(' Unknown message type:', (message as any).type);
+            break;
         }
       } catch (err) {
-        wsDebug.error(' Failed to parse message:', err);
+        console.error('[WS] Failed to parse message:', err);
       }
     },
     [initializeCanvas, updatePixel, setCooldown, setConfig, setResetting, setLastReset]
@@ -164,32 +152,27 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   // Connect to WebSocket (singleton pattern)
   const connect = useCallback(() => {
     if (!WS_URL) {
-      wsDebug.warn(' WebSocket disabled: NEXT_PUBLIC_WS_URL not set');
       setConnected(false);
       return;
     }
 
     // If already connected or connecting, reuse the existing connection
     if (globalWs?.readyState === WebSocket.OPEN) {
-      wsDebug.log(' Already connected (global)');
       wsRef.current = globalWs;
       setConnected(true);
       return;
     }
 
     if (globalWsConnecting) {
-      wsDebug.log(' Connection already in progress');
       return;
     }
 
-    wsDebug.log(' Connecting to:', WS_URL);
     globalWsConnecting = true;
 
     try {
       const ws = new WebSocket(WS_URL);
 
       ws.onopen = () => {
-        wsDebug.log(' Connected');
         globalWsConnecting = false;
         globalWs = ws;
         wsRef.current = ws;
@@ -199,7 +182,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         // Auto-authenticate if we have a session token
         const currentToken = useAuthStore.getState().sessionToken;
         if (currentToken) {
-          wsDebug.log(' Auto-authenticating with session token');
           ws.send(
             JSON.stringify({
               type: 'authenticate',
@@ -208,7 +190,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           );
         } else {
           // Request canvas state for unauthenticated users
-          wsDebug.log(' Requesting canvas state (unauthenticated)');
           ws.send(JSON.stringify({ type: 'get_canvas' }));
         }
 
@@ -218,7 +199,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       };
 
       ws.onclose = (event) => {
-        wsDebug.log(' Disconnected:', event.code, event.reason);
         globalWsConnecting = false;
         globalWs = null;
         wsRef.current = null;
@@ -247,7 +227,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       };
 
       ws.onerror = (error) => {
-        wsDebug.error(' Error:', error);
+        console.error('[WS] Error:', error);
         globalWsConnecting = false;
         if (mountedRef.current) {
           options.onError?.(error);
@@ -258,7 +238,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
       wsRef.current = ws;
     } catch (err) {
-      wsDebug.error(' Failed to connect:', err);
+      console.error('[WS] Failed to connect:', err);
       globalWsConnecting = false;
     }
   }, [handleMessage, setConnected, setReconnectAttempts, options]);
@@ -267,9 +247,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const send = useCallback((message: ClientMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
-      wsDebug.log(' Sent:', message.type);
     } else {
-      wsDebug.warn(' Cannot send, not connected');
+      console.warn('[WS] Cannot send, not connected');
     }
   }, []);
 
@@ -339,7 +318,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   // Re-authenticate when sessionToken changes (handles login after connection established)
   useEffect(() => {
     if (sessionToken && wsRef.current?.readyState === WebSocket.OPEN) {
-      wsDebug.log(' Session token changed, re-authenticating...');
       wsRef.current.send(
         JSON.stringify({
           type: 'authenticate',
