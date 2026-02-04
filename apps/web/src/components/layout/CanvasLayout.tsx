@@ -125,6 +125,11 @@ export function CanvasLayout() {
         className="absolute top-0 left-0 right-0 z-[60] pointer-events-none"
         role="banner"
       >
+        <div className="pointer-events-none absolute right-2 top-2 z-[70]">
+          <span className="rounded-md bg-red-600/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
+            Debug Build Active
+          </span>
+        </div>
         <div className="flex items-center justify-between px-3 md:px-5 py-2.5 md:py-3 bg-neutral-900/40 border-b border-white/10 backdrop-blur-xl">
           {/* Left side: Branding + Connection */}
           <div className="flex items-center gap-2 md:gap-4 pointer-events-auto">
