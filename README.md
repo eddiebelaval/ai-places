@@ -44,7 +44,7 @@ aiplaces/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/eddiebe147/x-place.git
+   git clone https://github.com/eddiebelaval/ai-places.git
    cd x-place
    ```
 
