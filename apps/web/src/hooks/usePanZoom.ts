@@ -65,6 +65,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
   const lastTouchRef = useRef<{ x: number; y: number } | null>(null);
   const isTouchingRef = useRef(false);
   const initialPinchDistRef = useRef<number>(0);
+  const lastPinchDistRef = useRef<number>(0);
   const initialZoomRef = useRef<number>(ZOOM.DEFAULT);
   const touchMovedRef = useRef(false);
   const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
@@ -152,7 +153,9 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
       lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
     } else if (e.touches.length === 2) {
-      initialPinchDistRef.current = getPinchDistance(e.touches[0], e.touches[1]);
+      const dist = getPinchDistance(e.touches[0], e.touches[1]);
+      initialPinchDistRef.current = dist;
+      lastPinchDistRef.current = dist;
       initialZoomRef.current = viewportRef.current.targetZoom;
       const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
       const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
@@ -207,8 +210,13 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       // Two finger pinch zoom
       touchMovedRef.current = true;
       const currentDist = getPinchDistance(e.touches[0], e.touches[1]);
-      const scale = currentDist / initialPinchDistRef.current;
-      const newZoom = Math.max(ZOOM.MIN, Math.min(ZOOM.MAX, initialZoomRef.current * scale));
+
+      if (lastPinchDistRef.current === 0) {
+        lastPinchDistRef.current = currentDist;
+        return;
+      }
+
+      if (Math.abs(currentDist - lastPinchDistRef.current) < 2) return;
 
       const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
       const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
@@ -218,7 +226,10 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       const relY = midY - centerY;
 
       setViewport((prev) => {
+        const scale = currentDist / lastPinchDistRef.current;
+        const newZoom = Math.max(ZOOM.MIN, Math.min(ZOOM.MAX, prev.targetZoom * scale));
         const zoomScale = newZoom / prev.targetZoom;
+
         return {
           ...prev,
           targetX: prev.targetX * zoomScale - relX * (zoomScale - 1),
@@ -226,6 +237,8 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
           targetZoom: newZoom,
         };
       });
+
+      lastPinchDistRef.current = currentDist;
     }
   }, [containerRef]);
 
@@ -248,6 +261,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       touchStartRef.current = null;
       lastTouchRef.current = null;
       initialPinchDistRef.current = 0;
+      lastPinchDistRef.current = 0;
       touchMovedRef.current = false;
       activeEventSystemRef.current = null; // Release so either system can start next gesture
       touchStartedInsideRef.current = false;
@@ -255,6 +269,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       // Went from 2 fingers to 1
       lastTouchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
       initialPinchDistRef.current = 0;
+      lastPinchDistRef.current = 0;
     }
   }, [containerRef, dispatchCanvasTap]);
 
