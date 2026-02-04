@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useEffect, useCallback, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { useCanvasStore } from '@/stores/canvas-store';
 import { useUIStore } from '@/stores/ui-store';
 import { useCanvasRenderer } from '@/hooks/useCanvasRenderer';
@@ -17,10 +16,15 @@ interface PixelCanvasProps {
 
 export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const searchParams = useSearchParams();
-  const isDebug = searchParams?.get('debug') === '1';
+  const [isDebug, setIsDebug] = useState(false);
   const [lastInputEvent, setLastInputEvent] = useState<string>('none');
   const [lastInputPos, setLastInputPos] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    setIsDebug(params.get('debug') === '1');
+  }, []);
 
   const { colorIndices, updatePixel, isLoading, error: canvasError } = useCanvasStore();
   const {
