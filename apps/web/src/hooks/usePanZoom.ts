@@ -130,7 +130,6 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
   const handleTouchStart = useCallback((e: TouchEvent) => {
     // CRITICAL: Must call preventDefault to stop browser scroll/zoom
     if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
 
     const container = containerRef.current;
     if (!container) return;
@@ -158,7 +157,6 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
   const handleTouchMove = useCallback((e: TouchEvent) => {
     // CRITICAL: Must call preventDefault to stop browser scroll/zoom
     if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
 
     const container = containerRef.current;
     if (!container || !isTouchingRef.current) return;
@@ -256,7 +254,6 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
   const handlePointerDown = useCallback((e: PointerEvent) => {
     if (e.pointerType === 'mouse') return;
     if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
 
     const container = containerRef.current;
     if (!container) return;
@@ -295,8 +292,8 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
 
   const handlePointerMove = useCallback((e: PointerEvent) => {
     if (e.pointerType === 'mouse') return;
+    if (!activePointersRef.current.has(e.pointerId)) return;
     if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
 
     const container = containerRef.current;
     if (!container || !isTouchingRef.current) return;
@@ -366,8 +363,8 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
 
   const handlePointerUp = useCallback((e: PointerEvent) => {
     if (e.pointerType === 'mouse') return;
+    if (!activePointersRef.current.has(e.pointerId)) return;
     if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
 
     const container = containerRef.current;
     if (!container) return;
