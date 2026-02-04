@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useCanvasStore } from '@/stores/canvas-store';
 import { useUIStore } from '@/stores/ui-store';
 import { useCanvasRenderer } from '@/hooks/useCanvasRenderer';
@@ -16,6 +17,10 @@ interface PixelCanvasProps {
 
 export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const isDebug = searchParams?.get('debug') === '1';
+  const [lastInputEvent, setLastInputEvent] = useState<string>('none');
+  const [lastInputPos, setLastInputPos] = useState<{ x: number; y: number } | null>(null);
 
   const { colorIndices, updatePixel, isLoading, error: canvasError } = useCanvasStore();
   const {
@@ -86,6 +91,60 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
     placePixelAt(e.clientX, e.clientY);
   }, [placePixelAt]);
 
+  // Debug: capture raw input events on the canvas container
+  useEffect(() => {
+    if (!isDebug) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updatePos = (x: number, y: number) => setLastInputPos({ x, y });
+
+    const onTouchStart = (e: TouchEvent) => {
+      setLastInputEvent('touchstart');
+      if (e.touches[0]) updatePos(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      setLastInputEvent('touchmove');
+      if (e.touches[0]) updatePos(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      setLastInputEvent('touchend');
+      if (e.changedTouches[0]) updatePos(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    };
+    const onPointerDown = (e: PointerEvent) => {
+      setLastInputEvent(`pointerdown (${e.pointerType})`);
+      updatePos(e.clientX, e.clientY);
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      setLastInputEvent(`pointermove (${e.pointerType})`);
+      updatePos(e.clientX, e.clientY);
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      setLastInputEvent(`pointerup (${e.pointerType})`);
+      updatePos(e.clientX, e.clientY);
+    };
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: true });
+    container.addEventListener('touchend', onTouchEnd, { passive: true });
+    container.addEventListener('touchcancel', onTouchEnd, { passive: true });
+    container.addEventListener('pointerdown', onPointerDown, { passive: true });
+    container.addEventListener('pointermove', onPointerMove, { passive: true });
+    container.addEventListener('pointerup', onPointerUp, { passive: true });
+    container.addEventListener('pointercancel', onPointerUp, { passive: true });
+
+    return () => {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('touchcancel', onTouchEnd);
+      container.removeEventListener('pointerdown', onPointerDown);
+      container.removeEventListener('pointermove', onPointerMove);
+      container.removeEventListener('pointerup', onPointerUp);
+      container.removeEventListener('pointercancel', onPointerUp);
+    };
+  }, [isDebug]);
+
   // Handle pixel placement (touch/pointer tap)
   useEffect(() => {
     const container = containerRef.current;
@@ -121,6 +180,13 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
       role="img"
       aria-label={`Pixel canvas, ${CANVAS_WIDTH} by ${CANVAS_HEIGHT} pixels. Use arrow keys to pan, plus and minus to zoom, zero to reset view.`}
     >
+      {isDebug && (
+        <div className="absolute top-2 left-2 z-50 pointer-events-none rounded-md bg-black/70 px-2 py-1 text-[11px] text-white">
+          <div>viewport: {Math.round(viewport.x)}, {Math.round(viewport.y)} @ {viewport.zoom.toFixed(2)}</div>
+          <div>last input: {lastInputEvent}</div>
+          <div>pos: {lastInputPos ? `${Math.round(lastInputPos.x)}, ${Math.round(lastInputPos.y)}` : '—'}</div>
+        </div>
+      )}
       {/* Error state */}
       {canvasError && (
         <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/90 z-50">
