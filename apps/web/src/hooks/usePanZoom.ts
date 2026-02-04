@@ -68,6 +68,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
   const lastPinchDistRef = useRef<number>(0);
   const initialZoomRef = useRef<number>(ZOOM.DEFAULT);
   const touchMovedRef = useRef(false);
+  const lastTapRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
   // Track which event system started the gesture to prevent double-processing
   const activeEventSystemRef = useRef<'touch' | 'pointer' | null>(null);
@@ -125,6 +126,30 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
     }));
   }, [containerRef]);
 
+  const zoomAtPoint = useCallback((clientX: number, clientY: number, targetZoom: number) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const pointX = clientX - rect.left;
+    const pointY = clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const relX = pointX - centerX;
+    const relY = pointY - centerY;
+
+    setViewport((prev) => {
+      const clampedZoom = Math.max(ZOOM.MIN, Math.min(ZOOM.MAX, targetZoom));
+      const scale = clampedZoom / prev.targetZoom;
+      return {
+        ...prev,
+        targetX: prev.targetX * scale - relX * (scale - 1),
+        targetY: prev.targetY * scale - relY * (scale - 1),
+        targetZoom: clampedZoom,
+      };
+    });
+  }, [containerRef]);
+
   // ============================================================
   // NATIVE EVENT HANDLERS - These access state via refs only!
   // ============================================================
@@ -153,6 +178,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
       lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
     } else if (e.touches.length === 2) {
+      lastTapRef.current = null;
       const dist = getPinchDistance(e.touches[0], e.touches[1]);
       initialPinchDistRef.current = dist;
       lastPinchDistRef.current = dist;
@@ -216,7 +242,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
         return;
       }
 
-      if (Math.abs(currentDist - lastPinchDistRef.current) < 2) return;
+      if (Math.abs(currentDist - lastPinchDistRef.current) < 0.75) return;
 
       const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
       const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
@@ -251,6 +277,21 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       const touchDuration = Date.now() - touchStartRef.current.time;
       if (touchDuration < 300) {
         const touch = e.changedTouches[0];
+        const now = Date.now();
+        const lastTap = lastTapRef.current;
+
+        if (lastTap && now - lastTap.time < 260) {
+          const dx = touch.clientX - lastTap.x;
+          const dy = touch.clientY - lastTap.y;
+          if (Math.hypot(dx, dy) < 24) {
+            lastTapRef.current = null;
+            const nextZoom = viewportRef.current.targetZoom < ZOOM.DRAW ? ZOOM.DRAW : ZOOM.DEFAULT;
+            zoomAtPoint(touch.clientX, touch.clientY, nextZoom);
+            return;
+          }
+        }
+
+        lastTapRef.current = { x: touch.clientX, y: touch.clientY, time: now };
         dispatchCanvasTap(touch.clientX, touch.clientY);
       }
     }
@@ -271,7 +312,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       initialPinchDistRef.current = 0;
       lastPinchDistRef.current = 0;
     }
-  }, [containerRef, dispatchCanvasTap]);
+  }, [containerRef, dispatchCanvasTap, zoomAtPoint]);
 
   const handlePointerDown = useCallback((e: PointerEvent) => {
     // Only handle pen input via PointerEvents on touch devices.

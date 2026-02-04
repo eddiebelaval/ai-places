@@ -121,6 +121,10 @@ export function PixelCanvas({ onPlacePixel }: PixelCanvasProps = {}) {
       role="img"
       aria-label={`Pixel canvas, ${CANVAS_WIDTH} by ${CANVAS_HEIGHT} pixels. Use arrow keys to pan, plus and minus to zoom, zero to reset view.`}
     >
+      <div className="absolute right-3 top-3 z-40 rounded-md border border-white/10 bg-neutral-950/70 px-2 py-1 text-[11px] text-neutral-200 backdrop-blur pointer-events-none">
+        Tip: Double-tap to zoom
+      </div>
+
       {/* Error state */}
       {canvasError && (
         <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/90 z-50">
