@@ -70,6 +70,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
   const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
   // Track which event system started the gesture to prevent double-processing
   const activeEventSystemRef = useRef<'touch' | 'pointer' | null>(null);
+  const touchStartedInsideRef = useRef(false);
 
   // Keep refs in sync
   useEffect(() => { viewportRef.current = viewport; }, [viewport]);
@@ -134,12 +135,16 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
     const container = containerRef.current;
     if (!container) return;
 
+    // Avoid double-handling if a touch sequence is already active
+    if (activeEventSystemRef.current === 'touch' && isTouchingRef.current) return;
+
     // If pointer events already started a gesture, don't interfere
     if (activeEventSystemRef.current === 'pointer') return;
 
     activeEventSystemRef.current = 'touch';
     isTouchingRef.current = true;
     touchMovedRef.current = false;
+    touchStartedInsideRef.current = true;
 
     if (e.touches.length === 1) {
       const touch = e.touches[0];
@@ -244,6 +249,7 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       initialPinchDistRef.current = 0;
       touchMovedRef.current = false;
       activeEventSystemRef.current = null; // Release so either system can start next gesture
+      touchStartedInsideRef.current = false;
     } else if (e.touches.length === 1) {
       // Went from 2 fingers to 1
       lastTouchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -547,14 +553,41 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('keydown', handleKeyDown);
 
-    const preventDocumentScroll = (event: TouchEvent) => {
-      const target = event.target as Node | null;
-      if (!target || !container.contains(target)) return;
-      if (event.cancelable) event.preventDefault();
+    const isTouchInsideContainer = (event: TouchEvent) => {
+      const touch = event.touches[0] || event.changedTouches[0];
+      if (!touch) return false;
+      const rect = container.getBoundingClientRect();
+      return (
+        touch.clientX >= rect.left &&
+        touch.clientX <= rect.right &&
+        touch.clientY >= rect.top &&
+        touch.clientY <= rect.bottom
+      );
     };
 
-    document.addEventListener('touchstart', preventDocumentScroll, { passive: false, capture: true });
-    document.addEventListener('touchmove', preventDocumentScroll, { passive: false, capture: true });
+    const documentTouchStart = (event: TouchEvent) => {
+      if (!isTouchInsideContainer(event)) return;
+      if (event.cancelable) event.preventDefault();
+      if (activeEventSystemRef.current === null) {
+        handleTouchStart(event);
+      }
+    };
+
+    const documentTouchMove = (event: TouchEvent) => {
+      if (!touchStartedInsideRef.current) return;
+      if (event.cancelable) event.preventDefault();
+      handleTouchMove(event);
+    };
+
+    const documentTouchEnd = (event: TouchEvent) => {
+      if (!touchStartedInsideRef.current) return;
+      handleTouchEnd(event);
+    };
+
+    document.addEventListener('touchstart', documentTouchStart, { passive: false, capture: true });
+    document.addEventListener('touchmove', documentTouchMove, { passive: false, capture: true });
+    document.addEventListener('touchend', documentTouchEnd, { passive: false, capture: true });
+    document.addEventListener('touchcancel', documentTouchEnd, { passive: false, capture: true });
 
     return () => {
       // Clean up touch events
@@ -576,8 +609,10 @@ export function usePanZoom({ containerRef, onCoordinateChange }: UsePanZoomOptio
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('touchstart', preventDocumentScroll);
-      document.removeEventListener('touchmove', preventDocumentScroll);
+      document.removeEventListener('touchstart', documentTouchStart);
+      document.removeEventListener('touchmove', documentTouchMove);
+      document.removeEventListener('touchend', documentTouchEnd);
+      document.removeEventListener('touchcancel', documentTouchEnd);
     };
   }, [
     containerRef,
