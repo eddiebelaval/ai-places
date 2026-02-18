@@ -29,8 +29,19 @@ async function performManualRotation(options: { dryRun?: boolean; forceMode?: st
   const redis = getRedis();
   const supabase = getSupabaseAdmin();
 
-  const configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
-  const currentConfig: WeekConfig = configStr ? JSON.parse(configStr as string) : createWeekConfig();
+  const configRaw = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+  let currentConfig: WeekConfig;
+  if (!configRaw) {
+    currentConfig = createWeekConfig();
+  } else if (typeof configRaw === 'string') {
+    try {
+      currentConfig = JSON.parse(configRaw);
+    } catch {
+      currentConfig = createWeekConfig();
+    }
+  } else {
+    currentConfig = configRaw as WeekConfig;
+  }
   const currentGameMode = await getCurrentGameMode(supabase);
   const nextModeId = forceMode || await getNextGameMode(supabase, currentGameMode.id);
 

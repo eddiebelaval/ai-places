@@ -22,10 +22,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const redis = getRedis();
-    const configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
-    const weekConfig = configStr
-      ? JSON.parse(configStr as string)
-      : createWeekConfig();
+    const configRaw = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+    let weekConfig;
+    if (!configRaw) {
+      weekConfig = createWeekConfig();
+    } else if (typeof configRaw === 'string') {
+      try {
+        weekConfig = JSON.parse(configRaw);
+      } catch {
+        console.error('[SNAPSHOT CRON] Failed to parse week config, creating new');
+        weekConfig = createWeekConfig();
+      }
+    } else {
+      weekConfig = configRaw;
+    }
 
     const snapshotCount = await getSnapshotCount(weekConfig.weekNumber, weekConfig.year);
 

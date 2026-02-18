@@ -41,10 +41,19 @@ export async function captureSnapshot(): Promise<CaptureResult> {
   const timestamp = now.toISOString();
 
   // Get current week config to determine week number
-  const configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
-  const weekConfig: WeekConfig = configStr
-    ? JSON.parse(configStr as string)
-    : createWeekConfig();
+  const configRaw = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+  let weekConfig: WeekConfig;
+  if (!configRaw) {
+    weekConfig = createWeekConfig();
+  } else if (typeof configRaw === 'string') {
+    try {
+      weekConfig = JSON.parse(configRaw);
+    } catch {
+      weekConfig = createWeekConfig();
+    }
+  } else {
+    weekConfig = configRaw as WeekConfig;
+  }
 
   // Read current canvas state
   const canvasBase64 = await redis.get(REDIS_KEYS.CANVAS_STATE);
@@ -177,10 +186,19 @@ export async function cleanupOldSnapshots(days: number): Promise<{
   let indexesScanned = 0;
 
   // Get current week config for reference
-  const configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
-  const weekConfig: WeekConfig = configStr
-    ? JSON.parse(configStr as string)
-    : createWeekConfig();
+  const configRaw = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+  let weekConfig: WeekConfig;
+  if (!configRaw) {
+    weekConfig = createWeekConfig();
+  } else if (typeof configRaw === 'string') {
+    try {
+      weekConfig = JSON.parse(configRaw);
+    } catch {
+      weekConfig = createWeekConfig();
+    }
+  } else {
+    weekConfig = configRaw as WeekConfig;
+  }
 
   // Calculate the range of weeks to scan (current week and previous weeks within retention)
   const weeksToScan = Math.ceil(days / 7) + 1;

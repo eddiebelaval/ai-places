@@ -41,10 +41,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const redis = getRedis();
     const supabase = getSupabaseAdmin();
 
-    const configStr = await redis.get(REDIS_KEYS.WEEK_CONFIG);
-    const currentConfig: WeekConfig = configStr
-      ? JSON.parse(configStr as string)
-      : createWeekConfig();
+    const configRaw = await redis.get(REDIS_KEYS.WEEK_CONFIG);
+    let currentConfig: WeekConfig;
+    if (!configRaw) {
+      currentConfig = createWeekConfig();
+    } else if (typeof configRaw === 'string') {
+      try {
+        currentConfig = JSON.parse(configRaw);
+      } catch (parseError) {
+        console.error('[CRON] Failed to parse week config, creating new:', parseError);
+        currentConfig = createWeekConfig();
+      }
+    } else {
+      currentConfig = configRaw as WeekConfig;
+    }
 
     console.log(`[CRON] Archiving week ${currentConfig.weekNumber}/${currentConfig.year}`);
 
